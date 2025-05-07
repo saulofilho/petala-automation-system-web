@@ -1,0 +1,11 @@
+.form {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f7f9fc;
+    border-radius: 6px;
+  }
+  
+  .form > *:not(:last-child) {
+    margin-bottom: 0.75rem;
+  }
+  
