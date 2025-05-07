@@ -1,16 +1,19 @@
+// app/src/app/components/Header.jsx
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import styles from './Header.module.css';
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, logout } = useAuth();
+  const showBack = Boolean(user) && pathname !== '/dashboard';
 
   return (
     <header className={styles.header}>
-      {user && (
+      {showBack ? (
         <button
           type="button"
           className={styles.btn}
@@ -18,6 +21,8 @@ export default function Header() {
         >
           ← Voltar
         </button>
+      ) : (
+        <div />
       )}
 
       {user && (
