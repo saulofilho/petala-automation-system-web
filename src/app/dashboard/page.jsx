@@ -1,3 +1,4 @@
+// app/src/app/dashboard/page.jsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -10,32 +11,41 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [companies, setCompanies] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
   useEffect(() => {
     if (!user) return;
     fetch(`${API_URL}/v1/users/${user.id}/companies`, {
       method: 'GET',
       credentials: 'include',
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Erro ao carregar empresas');
+        return res.json();
+      })
       .then(data => setCompanies(data.companies || data))
       .catch(console.error);
   }, [user]);
 
-  const handleCreate = companyData => {
-    fetch(`${API_URL}/v1/users/${user.id}/companies`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ company: { ...companyData, user_id: user.id } }),
-    })
-      .then(res => res.json())
-      .then(newCompany => {
-        setCompanies(prev => [...prev, newCompany]);
-        setShowForm(false);
-      })
-      .catch(console.error);
+  const handleCreate = async companyData => {
+    try {
+      const res = await fetch(
+        `${API_URL}/v1/users/${user.id}/companies`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ company: { ...companyData, user_id: user.id } }),
+        }
+      );
+      if (!res.ok) throw new Error('Erro ao criar empresa');
+      const data = await res.json();
+      const created = data.company || data;
+      setCompanies(prev => [...prev, created]);
+      setShowForm(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (!user) {
