@@ -17,14 +17,14 @@ export default function CompaniesTable({ companies }) {
       </thead>
       <tbody>
         {companies.length === 0 ? (
-          <tr>
+          <tr key="no-data">
             <td colSpan="6" className={styles.noData}>
               Nenhuma empresa cadastrada.
             </td>
           </tr>
         ) : (
-          companies.map(c => (
-            <tr key={c.id}>
+          companies.map((c, idx) => (
+            <tr key={c.id ?? idx}>
               <td>{c.name}</td>
               <td>{c.cnpj}</td>
               <td>{c.cep}</td>
