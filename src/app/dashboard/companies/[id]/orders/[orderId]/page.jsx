@@ -7,10 +7,6 @@ import Input from '../../../../../components/Input';
 import Button from '../../../../../components/Button';
 import styles from './page.module.css';
 
-// Regex para validações
-const ASIN_REGEX = /^[A-Z0-9]{10}$/;
-const EAN_REGEX = /^\d{13}$/;
-
 export default function OrderPage() {
   const router = useRouter();
   const { id: companyId, orderId, orderItemId } = useParams();
@@ -45,13 +41,9 @@ export default function OrderPage() {
   // Validação OrderItem
   const validateItem = () => {
     const errs = {};
-    if (!ASIN_REGEX.test(itemForm.code)) errs.code = 'Código inválido. Deve ser ASIN (10 caracteres alfanuméricos).';
     if (!itemForm.product.trim()) errs.product = 'Produto é obrigatório.';
     const price = parseFloat(itemForm.price);
     if (isNaN(price) || price < 10 || price > 100) errs.price = 'Preço deve estar entre 10.0 e 100.0.';
-    const qty = parseInt(itemForm.quantity, 10);
-    if (isNaN(qty) || qty < 1 || qty > 10) errs.quantity = 'Quantidade deve ser entre 1 e 10.';
-    if (!EAN_REGEX.test(itemForm.ean_code)) errs.ean_code = 'EAN inválido. Deve conter 13 dígitos.';
     return errs;
   };
 

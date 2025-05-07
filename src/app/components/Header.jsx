@@ -9,6 +9,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout } = useAuth();
+
   const showBack = Boolean(user) && pathname !== '/dashboard';
 
   return (
@@ -17,9 +18,9 @@ export default function Header() {
         <button
           type="button"
           className={styles.btn}
-          onClick={() => router.back()}
+          onClick={() => router.push('/dashboard')}
         >
-          ← Voltar
+          Home
         </button>
       ) : (
         <div />
