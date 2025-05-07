@@ -1,6 +1,6 @@
-// app/src/app/layout.js
 import './globals.css';
 import { AuthProvider } from './context/AuthContext';
+import Header from './components/Header';
 
 export const metadata = {
   title: 'Pétala Comercial',
@@ -12,6 +12,7 @@ export default function RootLayout({ children }) {
     <html lang="pt-BR">
       <body>
         <AuthProvider>
+          <Header />
           {children}
         </AuthProvider>
       </body>
