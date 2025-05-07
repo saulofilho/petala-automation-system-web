@@ -1,8 +1,15 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import styles from './CompaniesTable.module.css';
 
 export default function CompaniesTable({ companies }) {
+  const router = useRouter();
+
+  const handleRowClick = id => {
+    router.push(`/dashboard/companies/${id}`);
+  };
+
   return (
     <table className={styles.table}>
       <thead>
@@ -24,7 +31,11 @@ export default function CompaniesTable({ companies }) {
           </tr>
         ) : (
           companies.map((c, idx) => (
-            <tr key={c.id ?? idx}>
+            <tr
+              key={c.id ?? idx}
+              className={styles.row}
+              onClick={() => handleRowClick(c.id)}
+            >
               <td>{c.name}</td>
               <td>{c.cnpj}</td>
               <td>{c.cep}</td>
@@ -36,5 +47,5 @@ export default function CompaniesTable({ companies }) {
         )}
       </tbody>
     </table>
-  );
+);
 }

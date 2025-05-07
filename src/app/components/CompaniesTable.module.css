@@ -16,3 +16,9 @@
     color: #666;
   }
   
+.row {
+  cursor: pointer;
+}
+.row:hover {
+  background-color: rgba(0, 112, 243, 0.05);
+}

@@ -1,4 +1,3 @@
-// app/src/app/dashboard/page.jsx
 'use client';
 
 import { useEffect, useState } from 'react';
