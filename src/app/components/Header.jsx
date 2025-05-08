@@ -3,7 +3,7 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import styles from './Header.module.css';
+import styles from '../Global.module.css';
 
 export default function Header() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function Header() {
       {showBack ? (
         <button
           type="button"
-          className={styles.btn}
+          className={styles.button}
           onClick={() => router.push('/dashboard')}
         >
           Home
@@ -29,7 +29,7 @@ export default function Header() {
       {user && (
         <button
           type="button"
-          className={styles.btn}
+          className={styles.button}
           onClick={logout}
         >
           Logout

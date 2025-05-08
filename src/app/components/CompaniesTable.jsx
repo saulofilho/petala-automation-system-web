@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import styles from './CompaniesTable.module.css';
+import styles from '../Global.module.css';
 
 export default function CompaniesTable({ companies }) {
   const router = useRouter();

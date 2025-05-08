@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
-import styles from './page.module.css';
+import styles from '../../../Global.module.css';
 
 // Regex e máscaras
 const CNPJ_REGEX = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;

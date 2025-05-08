@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Input from './Input';
 import Button from './Button';
-import styles from './CompanyForm.module.css';
+import styles from '../Global.module.css';
 
 const CNPJ_REGEX = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
 const CEP_REGEX = /^\d{5}-\d{3}$/;

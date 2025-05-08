@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Input from './Input';
 import Button from './Button';
 import { useAuth } from '../context/AuthContext';
-import styles from './LoginForm.module.css';
+import styles from '../Global.module.css';
 
 export default function LoginForm() {
   const { login } = useAuth();
@@ -30,25 +30,31 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      {error && <p className={styles.error}>{error}</p>}
-      <Input
-        label="Email"
-        name="email"
-        type="email"
-        value={form.email}
-        onChange={handleChange}
-      />
-      <Input
-        label="Senha"
-        name="password"
-        type="password"
-        value={form.password}
-        onChange={handleChange}
-      />
-      <Button type="submit" disabled={loading}>
-        {loading ? 'Entrando...' : 'Entrar'}
-      </Button>
-    </form>
+    <section>
+      <p>
+        Welcome Back
+        Log in to your account using email and password
+      </p>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        {error && <p className={styles.error}>{error}</p>}
+        <Input
+          label="Email"
+          name="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange}
+        />
+        <Input
+          label="Senha"
+          name="password"
+          type="password"
+          value={form.password}
+          onChange={handleChange}
+        />
+        <Button type="submit" disabled={loading}>
+          {loading ? 'Entrando...' : 'Entrar'}
+        </Button>
+      </form>
+    </section>
   );
 }

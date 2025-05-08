@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../../../../../../context/AuthContext';
 import Input from '../../../../../../../components/Input';
 import Button from '../../../../../../../components/Button';
-import styles from './page.module.css';
+import styles from '../../../../../../../Global.module.css';
 
 export default function OrderItemPage() {
   const router = useRouter();

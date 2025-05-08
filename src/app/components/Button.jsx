@@ -1,7 +1,7 @@
 // app/src/app/components/Button.jsx
 'use client';
 
-import styles from './Button.module.css';
+import styles from '../Global.module.css';
 
 export default function Button({ children, onClick, type = 'button', disabled = false }) {
   return (

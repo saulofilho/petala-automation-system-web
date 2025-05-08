@@ -1,7 +1,7 @@
 // app/src/app/components/Input.jsx
 'use client';
 
-import styles from './Input.module.css';
+import styles from '../Global.module.css';
 
 export default function Input({ label, type = 'text', value, onChange, name }) {
   return (
