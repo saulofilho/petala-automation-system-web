@@ -1,152 +1,180 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Input from './Input';
+import Button from './Button';
 import styles from '../Global.module.css';
 
-export default function UserForm({ onCreate }) {
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CPF_REGEX = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+const PHONE_REGEX = /^\(\d{2}\) \d{4,5}-\d{4}$/;
+
+function maskCPF(value) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  return digits
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3}\.\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3}\.\d{3}\.\d{3})(\d{1,2})$/, '$1-$2');
+}
+
+function maskPhone(value) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 10) {
+    return digits
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4})(\d)/, '$1-$2');
+  }
+  return digits
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2');
+}
+
+export default function UserForm({
+  initialData = {},
+  onCreate,
+  onDelete,
+  isEdit = false
+}) {
   const [form, setForm] = useState({
     email: '',
     password: '',
     name: '',
     cpf: '',
     phone: '',
-    role: 'admin',
+    role: initialData.role || 'admin'
   });
   const [errors, setErrors] = useState({});
 
-  const formatCPF = value => {
-    const digits = value.replace(/\D/g, '').slice(0, 11);
-    return digits
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-  };
-
-  const formatPhone = value => {
-    const digits = value.replace(/\D/g, '').slice(0, 11);
-    if (digits.length <= 10) {
-      return digits
-        .replace(/(\d{2})(\d)/, '($1) $2')
-        .replace(/(\d{4})(\d)/, '$1-$2');
-    } else {
-      return digits
-        .replace(/(\d{2})(\d)/, '($1) $2')
-        .replace(/(\d{5})(\d)/, '$1-$2');
+  useEffect(() => {
+    if (isEdit && initialData) {
+      setForm({
+        email: initialData.email || '',
+        password: '',
+        name: initialData.name || '',
+        cpf: initialData.cpf || '',
+        phone: initialData.phone || '',
+        role: initialData.role || 'admin'
+      });
+      setErrors({});
     }
-  };
+  }, [initialData, isEdit]);
 
   const handleChange = e => {
     const { name, value } = e.target;
-    let v = value;
-    if (name === 'cpf') v = formatCPF(value);
-    if (name === 'phone') v = formatPhone(value);
-
-    setForm(prev => ({ ...prev, [name]: v }));
-    setErrors(prev => ({ ...prev, [name]: '' }));
+    let val = value;
+    if (name === 'cpf') val = maskCPF(val);
+    if (name === 'phone') val = maskPhone(val);
+    setForm(prev => ({ ...prev, [name]: val }));
+    setErrors(prev => ({ ...prev, [name]: null }));
   };
 
   const validate = () => {
     const errs = {};
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      errs.email = 'Email inválido';
-
-    if (
-      !/(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/.test(form.password)
-    )
-      errs.password =
-        'Senha precisa ter ≥8 caracteres, uma maiúscula, uma minúscula e um dígito';
-
-    if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(form.cpf))
-      errs.cpf = 'CPF deve estar no formato 000.000.000-00';
-
-    if (!/^\(\d{2}\) \d{4,5}-\d{4}$/.test(form.phone))
-      errs.phone = 'Telefone deve ser (00) 0000-0000 ou (00) 00000-0000';
-
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
+    if (!EMAIL_REGEX.test(form.email)) errs.email = 'Email inválido';
+    if (!form.name.trim()) errs.name = 'Nome é obrigatório';
+    if (!CPF_REGEX.test(form.cpf)) errs.cpf = 'CPF inválido. Formato: 000.000.000-00';
+    if (!PHONE_REGEX.test(form.phone)) errs.phone = 'Telefone inválido. Use (00) 0000-0000 ou (00) 00000-0000';
+    return errs;
   };
 
   const handleSubmit = e => {
     e.preventDefault();
-    if (!validate()) return;
-    onCreate(form);
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    const payload = { ...form };
+    if (isEdit) delete payload.password;
+    onCreate(payload);
+  };
+
+  const handleDelete = () => {
+    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+      onDelete(initialData.id);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <div className={styles.field}>
-        <label>Email:</label>
-        <input
-          name="email"
-          type="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        {errors.email && (
-          <span className={styles.errorText}>{errors.email}</span>
+    <form onSubmit={handleSubmit} className={styles.userForm} noValidate>
+      <Input
+        label="Email"
+        name="email"
+        type="email"
+        value={form.email}
+        onChange={handleChange}
+        required
+      />
+      {errors.email && <p className={styles.error}>{errors.email}</p>}
+
+      {!isEdit && (
+        <>
+          <Input
+            label="Senha"
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+          {errors.password && <p className={styles.error}>{errors.password}</p>}
+        </>
+      )}
+
+      <Input
+        label="Nome"
+        name="name"
+        type="text"
+        value={form.name}
+        onChange={handleChange}
+        required
+      />
+      {errors.name && <p className={styles.error}>{errors.name}</p>}
+
+      <Input
+        label="CPF"
+        name="cpf"
+        type="text"
+        value={form.cpf}
+        onChange={handleChange}
+        required
+        maxLength={14}
+      />
+      {errors.cpf && <p className={styles.error}>{errors.cpf}</p>}
+
+      <Input
+        label="Telefone"
+        name="phone"
+        type="text"
+        value={form.phone}
+        onChange={handleChange}
+        required
+        maxLength={15}
+      />
+      {errors.phone && <p className={styles.error}>{errors.phone}</p>}
+
+      <Input
+        label="Role"
+        name="role"
+        as="select"
+        value={form.role}
+        onChange={handleChange}
+      >
+        <option value="admin">admin</option>
+        <option value="client">client</option>
+        <option value="promoter">promoter</option>
+      </Input>
+
+      <div style={{ display: 'flex', justifyContent: isEdit ? 'space-between' : 'center' }}>
+        {isEdit && (
+          <Button type="button" variant="destructive" onClick={handleDelete}>
+            Excluir Usuário
+          </Button>
         )}
+        <Button type="submit">
+          {isEdit ? 'Salvar Alterações' : 'Criar Usuário'}
+        </Button>
       </div>
-
-      <div className={styles.field}>
-        <label>Senha:</label>
-        <input
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        {errors.password && (
-          <span className={styles.errorText}>{errors.password}</span>
-        )}
-      </div>
-
-      <div className={styles.field}>
-        <label>Nome:</label>
-        <input
-          name="name"
-          type="text"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-      </div>
-
-      <div className={styles.field}>
-        <label>CPF:</label>
-        <input
-          name="cpf"
-          type="text"
-          value={form.cpf}
-          onChange={handleChange}
-          required
-          maxLength={14}
-        />
-        {errors.cpf && (
-          <span className={styles.errorText}>{errors.cpf}</span>
-        )}
-      </div>
-
-      <div className={styles.field}>
-        <label>Telefone:</label>
-        <input
-          name="phone"
-          type="text"
-          value={form.phone}
-          onChange={handleChange}
-          required
-          maxLength={15}
-        />
-        {errors.phone && (
-          <span className={styles.errorText}>{errors.phone}</span>
-        )}
-      </div>
-
-      <button type="submit" className={styles.button}>
-        Criar Usuário
-      </button>
     </form>
   );
 }

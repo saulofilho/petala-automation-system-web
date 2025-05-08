@@ -30,7 +30,7 @@ export default function CompanyPage() {
   // Orders state
   const [orders, setOrders] = useState([]);
   const [showOrderForm, setShowOrderForm] = useState(false);
-  const [orderForm, setOrderForm] = useState({ status:'pending', admin_feedback:'' });
+  const [orderForm, setOrderForm] = useState({ description: '', status:'pending', admin_feedback:'' });
   const [orderErrors, setOrderErrors] = useState({});
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -111,7 +111,7 @@ export default function CompanyPage() {
     const { order } = await res.json();
     setOrders(o=>[...o,order]);
     setShowOrderForm(false);
-    setOrderForm({status:'pending',admin_feedback:''});
+    setOrderForm({description: '', status:'pending', admin_feedback:''});
   };
 
   if(loading) return <p>Carregando empresa…</p>;
@@ -137,6 +137,7 @@ export default function CompanyPage() {
           <thead>
             <tr>
               <th>ID</th>
+              <th>Description</th>
               <th>Status</th>
               <th>Feedback</th>
             </tr>
@@ -152,7 +153,7 @@ export default function CompanyPage() {
               orders.map((o) => (
                 <tr
                   key={o.id}
-                  className={styles.row}             // adicione .row no CSS para hover/cursor
+                  className={styles.row}
                   onClick={() =>
                     router.push(
                       `/dashboard/companies/${companyId}/orders/${o.id}`
@@ -160,6 +161,7 @@ export default function CompanyPage() {
                   }
                 >
                   <td>{o.id}</td>
+                  <td>{o.description}</td>
                   <td>{o.status}</td>
                   <td>{o.admin_feedback || '-'}</td>
                 </tr>
@@ -167,14 +169,18 @@ export default function CompanyPage() {
             )}
           </tbody>
         </table>
+
         <Button onClick={()=>setShowOrderForm(s=>!s)}>{showOrderForm?'Cancelar':'Adicionar Order'}</Button>
+
         {showOrderForm&&(
           <form className={styles.form} onSubmit={handleOrderCreate} noValidate>
+            <Input label="Description" name="description" value={orderForm.description} onChange={handleOrderChange}/> {orderErrors.description&&<p className={styles.error}>{orderErrors.description}</p>}
             <Input label="Status" name="status" value={orderForm.status} onChange={handleOrderChange}/> {orderErrors.status&&<p className={styles.error}>{orderErrors.status}</p>}
             <Input label="Feedback" name="admin_feedback" value={orderForm.admin_feedback} onChange={handleOrderChange}/>
             <Button type="submit">Salvar Order</Button>
           </form>
         )}
+
       </section>
     </div>
   );

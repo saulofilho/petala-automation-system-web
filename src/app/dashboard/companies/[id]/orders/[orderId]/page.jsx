@@ -9,8 +9,8 @@ import styles from '../../../../../Global.module.css';
 
 export default function OrderPage() {
   const router = useRouter();
-  const { id: companyId, orderId, orderItemId } = useParams();
-  const { user, logout } = useAuth();
+  const { companyId, orderId } = useParams();    // <-- corrige aqui
+  const { user } = useAuth();
 
   const [order, setOrder] = useState(null);
   const [orderForm, setOrderForm] = useState({ status: '', admin_feedback: '' });
@@ -19,60 +19,94 @@ export default function OrderPage() {
   const [itemForm, setItemForm] = useState({ code: '', product: '', price: '', quantity: '', ean_code: '' });
   const [itemErrors, setItemErrors] = useState({});
 
-  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  // Carrega pedido e itens
+  // carrega o pedido e o form de edição
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const resOrder = await fetch(`${API}/v1/orders/${orderId}`, { credentials: 'include' });
-      const { order: ord } = await resOrder.json();
+      const res = await fetch(`${API}/v1/orders/${orderId}`, { credentials: 'include' });
+      if (!res.ok) return;
+      const { order: ord } = await res.json();
       setOrder(ord);
       setOrderForm({ status: ord.status, admin_feedback: ord.admin_feedback || '' });
-
-      const resItems = await fetch(`${API}/v1/orders/${orderId}/order_items`, { credentials: 'include' });
-      const { order_items } = await resItems.json();
-      setItems(order_items);
     })();
   }, [user, orderId]);
 
+  // carrega os itens
+  useEffect(() => {
+    if (!order) return;
+    (async () => {
+      const res = await fetch(`${API}/v1/orders/${orderId}/order_items`, { credentials: 'include' });
+      if (!res.ok) return;
+      const { order_items } = await res.json();
+      setItems(order_items);
+    })();
+  }, [order, orderId]);
+
   if (!order) return <p>Carregando pedido…</p>;
 
-  // Validação OrderItem
-  const validateItem = () => {
-    const errs = {};
-    if (!itemForm.product.trim()) errs.product = 'Produto é obrigatório.';
-    const price = parseFloat(itemForm.price);
-    if (isNaN(price) || price < 10 || price > 100) errs.price = 'Preço deve estar entre 10.0 e 100.0.';
-    return errs;
+  // --- Handlers do form de pedido ---
+  const handleOrderChange = (e) => {
+    const { name, value } = e.target;
+    setOrderForm(f => ({ ...f, [name]: value }));
   };
 
-  const handleItemSave = async (e) => {
+  const handleOrderUpdate = async (e) => {
     e.preventDefault();
-    const errs = validateItem();
-    if (Object.keys(errs).length) {
-      setItemErrors(errs);
-      return;
-    }
-    const payload = { order_item: { ...itemForm, order_id: Number(orderId) } };
-    const res = await fetch(`${API}/v1/orders/${orderId}/order_items`, {
-      method: 'POST',
+    // opcional: validações de status/admin_feedback aqui
+    const res = await fetch(`${API}/v1/orders/${orderId}`, {
+      method: 'PATCH',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ order: orderForm }),
     });
-    const { order_item } = await res.json();
-    setItems((prev) => [...prev, order_item]);
-    setShowItemForm(false);
-    setItemForm({ code: '', product: '', price: '', quantity: '', ean_code: '' });
-    setItemErrors({});
+    if (res.ok) {
+      const { order: updated } = await res.json();
+      setOrder(updated);
+      router.push(`/dashboard/companies/${companyId}`); // ou onde fizer sentido
+    }
   };
+
+  const handleOrderDelete = async () => {
+    if (!confirm('Confirma exclusão deste pedido?')) return;
+    await fetch(`${API}/v1/orders/${orderId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    router.push(`/dashboard/companies/${companyId}`);
+  };
+
+  // --- resto do código de itemForm (igual ao seu) ---
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Editar Pedido #{order.id}</h1>
-      {/* ... seção de edição de pedido permanece ... */}
 
+      {/* === FORM DE EDIÇÃO DO PEDIDO === */}
+      <form className={styles.form} onSubmit={handleOrderUpdate} noValidate>
+        <Input
+          label="Status"
+          name="status"
+          value={orderForm.status}
+          onChange={handleOrderChange}
+        />
+        <Input
+          label="Feedback do Admin"
+          name="admin_feedback"
+          value={orderForm.admin_feedback}
+          onChange={handleOrderChange}
+        />
+
+        <div className={styles.buttons}>
+          <Button type="submit">Salvar Pedido</Button>
+          <Button type="button" onClick={handleOrderDelete}>
+            Excluir Pedido
+          </Button>
+        </div>
+      </form>
+
+      {/* === SEÇÃO DE ITENS DO PEDIDO === */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Itens do Pedido</h2>
         <table className={styles.table}>
@@ -122,22 +156,7 @@ export default function OrderPage() {
 
         {showItemForm && (
           <form className={styles.form} onSubmit={handleItemSave} noValidate>
-            <Input label="Código" name="code" value={itemForm.code} onChange={(e) => setItemForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))} />
-            {itemErrors.code && <p className={styles.error}>{itemErrors.code}</p>}
-
-            <Input label="Produto" name="product" value={itemForm.product} onChange={(e) => setItemForm((f) => ({ ...f, product: e.target.value }))} />
-            {itemErrors.product && <p className={styles.error}>{itemErrors.product}</p>}
-
-            <Input label="Preço" name="price" type="number" step="0.01" value={itemForm.price} onChange={(e) => setItemForm((f) => ({ ...f, price: e.target.value }))} />
-            {itemErrors.price && <p className={styles.error}>{itemErrors.price}</p>}
-
-            <Input label="Quantidade" name="quantity" type="number" value={itemForm.quantity} onChange={(e) => setItemForm((f) => ({ ...f, quantity: e.target.value }))} />
-            {itemErrors.quantity && <p className={styles.error}>{itemErrors.quantity}</p>}
-
-            <Input label="EAN" name="ean_code" value={itemForm.ean_code} onChange={(e) => setItemForm((f) => ({ ...f, ean_code: e.target.value }))} />
-            {itemErrors.ean_code && <p className={styles.error}>{itemErrors.ean_code}</p>}
-
-            <Button type="submit">Salvar Item</Button>
+            {/* seu form de itemForm… */}
           </form>
         )}
       </section>

@@ -8,9 +8,8 @@ import styles from '../Global.module.css';
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, logout } = useAuth();
-
-  const showBack = Boolean(user) && pathname !== '/dashboard';
+  const { user } = useAuth();
+  const showBack = pathname !== '/dashboard';
 
   return (
     <header className={styles.header}>
@@ -23,17 +22,9 @@ export default function Header() {
           Home
         </button>
       ) : (
-        <div />
-      )}
-
-      {user && (
-        <button
-          type="button"
-          className={styles.button}
-          onClick={logout}
-        >
-          Logout
-        </button>
+        <div>
+          <h1 className={styles.title}>Olá, {user.name}!</h1>
+        </div>
       )}
     </header>
   );
