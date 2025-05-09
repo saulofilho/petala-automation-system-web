@@ -20,96 +20,132 @@ export default function CompanyPage() {
   const { id: companyId } = useParams();
   const { user, logout } = useAuth();
 
+  // estados gerais
   const [form, setForm] = useState({ name:'', cnpj:'', cep:'', street:'', number:'', city:'', state:'' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
+  // orders
   const [orders, setOrders] = useState([]);
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [orderForm, setOrderForm] = useState({ description: '', status:'pending', admin_feedback:'' });
   const [orderErrors, setOrderErrors] = useState({});
 
+  // novo estado para mostrar/ocultar o form de empresa
+  const [showCompanyForm, setShowCompanyForm] = useState(false);
+
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
+  // fetch empresa
   useEffect(()=>{
     if(!user||!companyId) return;
     (async ()=>{
       try{
-        const res=await fetch(`${API}/v1/companies/${companyId}`,{credentials:'include'});
-        if(!res.ok){setNotFound(true);return;}
+        const res = await fetch(`${API}/v1/companies/${companyId}`, { credentials:'include' });
+        if(!res.ok){ setNotFound(true); return; }
         const { company } = await res.json();
         setForm({
-          name:company.name||'', cnpj:company.cnpj||'', cep:company.cep||'', street:company.street||'',
-          number:company.number?.toString()||'', city:company.city||'', state:company.state||''
+          name: company.name||'',
+          cnpj: company.cnpj||'',
+          cep: company.cep||'',
+          street: company.street||'',
+          number: company.number?.toString()||'',
+          city: company.city||'',
+          state: company.state||''
         });
-      }catch{setNotFound(true);}finally{setLoading(false);}      
+      } catch {
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
     })();
-  },[user,companyId]);
+  }, [user, companyId]);
 
+  // fetch pedidos
   useEffect(()=>{
-    if(loading||notFound) return;
+    if(loading || notFound) return;
     (async ()=>{
       try{
-        const res=await fetch(`${API}/v1/companies/${companyId}/orders`,{credentials:'include'});
+        const res = await fetch(`${API}/v1/companies/${companyId}/orders`, { credentials:'include' });
         if(!res.ok) return;
         const { orders } = await res.json();
         setOrders(orders);
-      }catch(e){console.error(e);}      
+      } catch(e){
+        console.error(e);
+      }
     })();
-  },[loading,notFound]);
+  }, [loading, notFound]);
 
-  const validateCompany=()=>{
-    const e={};
-    if(!form.name.trim()) e.name='Nome é obrigatório';
-    if(!CNPJ_REGEX.test(form.cnpj)) e.cnpj='CNPJ inválido';
-    if(!CEP_REGEX.test(form.cep)) e.cep='CEP inválido';
-    if(!form.street.trim()) e.street='Rua é obrigatória';
-    if(!form.number||!Number.isInteger(Number(form.number))) e.number='Número inválido';
-    if(!form.city.trim()) e.city='Cidade é obrigatória';
-    if(!STATE_REGEX.test(form.state)) e.state='Estado inválido';
+  // validações da empresa
+  const validateCompany = () => {
+    const e = {};
+    if(!form.name.trim()) e.name = 'Nome é obrigatório';
+    if(!CNPJ_REGEX.test(form.cnpj)) e.cnpj = 'CNPJ inválido';
+    if(!CEP_REGEX.test(form.cep)) e.cep = 'CEP inválido';
+    if(!form.street.trim()) e.street = 'Rua é obrigatória';
+    if(!form.number || !Number.isInteger(Number(form.number))) e.number = 'Número inválido';
+    if(!form.city.trim()) e.city = 'Cidade é obrigatória';
+    if(!STATE_REGEX.test(form.state)) e.state = 'Estado inválido';
     return e;
   };
 
-  const handleChange=(e)=>{
-    let v=e.target.value;
-    if(e.target.name==='cnpj') v=maskCNPJ(v);
-    if(e.target.name==='cep') v=maskCEP(v);
-    if(e.target.name==='state') v=maskState(v);
-    if(e.target.name==='number') v=maskNumber(v);
-    setForm(f=>({...f,[e.target.name]:v}));
-    setErrors(err=>({...err,[e.target.name]:null}));
+  // handlers de form
+  const handleChange = e => {
+    let v = e.target.value;
+    if(e.target.name === 'cnpj') v = maskCNPJ(v);
+    if(e.target.name === 'cep') v = maskCEP(v);
+    if(e.target.name === 'state') v = maskState(v);
+    if(e.target.name === 'number') v = maskNumber(v);
+    setForm(f => ({ ...f, [e.target.name]: v }));
+    setErrors(err => ({ ...err, [e.target.name]: null }));
   };
 
-  const handleUpdate=async(e)=>{
-    e.preventDefault();const ev=validateCompany();if(Object.keys(ev).length){setErrors(ev);return;}    
-    await fetch(`${API}/v1/companies/${companyId}`,{
-      method:'PATCH',credentials:'include',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({company:{...form,number:Number(form.number),user_id:user.id}})
+  const handleUpdate = async e => {
+    e.preventDefault();
+    const ev = validateCompany();
+    if(Object.keys(ev).length){ setErrors(ev); return; }
+    await fetch(`${API}/v1/companies/${companyId}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ company: { ...form, number: Number(form.number), user_id: user.id } })
     });
     router.push('/dashboard');
   };
 
-  const handleDelete=async()=>{if(!confirm('Confirma exclusão?'))return;await fetch(`${API}/v1/companies/${companyId}`,{method:'DELETE',credentials:'include'});router.push('/dashboard');};
+  const handleDelete = async () => {
+    if(!confirm('Confirma exclusão?')) return;
+    await fetch(`${API}/v1/companies/${companyId}`, { method:'DELETE', credentials:'include' });
+    router.push('/dashboard');
+  };
 
-  const validateOrder=()=>{
-    const e={};
-    if(!orderForm.status.trim()) e.status='Status é obrigatório';
+  // validações pedido
+  const validateOrder = () => {
+    const e = {};
+    if(!orderForm.status.trim()) e.status = 'Status é obrigatório';
     return e;
   };
 
-  const handleOrderChange=e=>{
-    setOrderForm(o=>({...o,[e.target.name]:e.target.value}));
-    setOrderErrors(err=>({...err,[e.target.name]:null}));
+  const handleOrderChange = e => {
+    setOrderForm(o => ({ ...o, [e.target.name]: e.target.value }));
+    setOrderErrors(err => ({ ...err, [e.target.name]: null }));
   };
   
-  const handleOrderCreate=async(e)=>{
-    e.preventDefault();const ev=validateOrder();if(Object.keys(ev).length){setOrderErrors(ev);return;}    
-    const res=await fetch(`${API}/v1/companies/${companyId}/orders`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({order:{...orderForm,company_id:Number(companyId)}})});
+  const handleOrderCreate = async e => {
+    e.preventDefault();
+    const ev = validateOrder();
+    if(Object.keys(ev).length){ setOrderErrors(ev); return; }
+    const res = await fetch(`${API}/v1/companies/${companyId}/orders`, {
+      method:'POST',
+      credentials:'include',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ order:{ ...orderForm, company_id: Number(companyId) } })
+    });
     const { order } = await res.json();
-    setOrders(o=>[...o,order]);
+    setOrders(o => [...o, order]);
     setShowOrderForm(false);
-    setOrderForm({description: '', status:'pending', admin_feedback:''});
+    setOrderForm({ description:'', status:'pending', admin_feedback:'' });
   };
 
   if(loading) return <p>Carregando empresa…</p>;
@@ -117,18 +153,7 @@ export default function CompanyPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Editar Empresa</h1>
-      <form className={styles.form} onSubmit={handleUpdate} noValidate>
-        <Input label="Nome" name="name" value={form.name} onChange={handleChange}/> {errors.name&&<p className={styles.error}>{errors.name}</p>}
-        <Input label="CNPJ" name="cnpj" value={form.cnpj} onChange={handleChange}/> {errors.cnpj&&<p className={styles.error}>{errors.cnpj}</p>}
-        <Input label="CEP" name="cep" value={form.cep} onChange={handleChange}/> {errors.cep&&<p className={styles.error}>{errors.cep}</p>}
-        <Input label="Rua" name="street" value={form.street} onChange={handleChange}/> {errors.street&&<p className={styles.error}>{errors.street}</p>}
-        <Input label="Número" name="number" type="text" value={form.number} onChange={handleChange}/> {errors.number&&<p className={styles.error}>{errors.number}</p>}
-        <Input label="Cidade" name="city" value={form.city} onChange={handleChange}/> {errors.city&&<p className={styles.error}>{errors.city}</p>}
-        <Input label="Estado" name="state" value={form.state} onChange={handleChange} maxLength={2}/> {errors.state&&<p className={styles.error}>{errors.state}</p>}
-        <div className={styles.buttons}><Button type="submit">Salvar</Button><Button type="button" onClick={handleDelete}>Excluir</Button></div>
-      </form>
-
+      {/* Seção de Orders */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Orders</h2>
         <table className={styles.table}>
@@ -143,20 +168,16 @@ export default function CompanyPage() {
           <tbody>
             {orders.length === 0 ? (
               <tr key="no-orders">
-                <td colSpan={3} className={styles.noData}>
+                <td colSpan={4} className={styles.noData}>
                   Nenhum pedido.
                 </td>
               </tr>
             ) : (
-              orders.map((o) => (
+              orders.map(o => (
                 <tr
                   key={o.id}
                   className={styles.row}
-                  onClick={() =>
-                    router.push(
-                      `/dashboard/companies/${companyId}/orders/${o.id}`
-                    )
-                  }
+                  onClick={() => router.push(`/dashboard/companies/${companyId}/orders/${o.id}`)}
                 >
                   <td>{o.id}</td>
                   <td>{o.description}</td>
@@ -168,18 +189,62 @@ export default function CompanyPage() {
           </tbody>
         </table>
 
-        <Button onClick={()=>setShowOrderForm(s=>!s)}>{showOrderForm?'Cancelar':'Adicionar Order'}</Button>
+        <Button onClick={() => setShowOrderForm(s => !s)}>
+          {showOrderForm ? 'Cancelar Pedido' : 'Adicionar Order'}
+        </Button>
 
-        {showOrderForm&&(
+        {showOrderForm && (
           <form className={styles.form} onSubmit={handleOrderCreate} noValidate>
-            <Input label="Description" name="description" value={orderForm.description} onChange={handleOrderChange}/> {orderErrors.description&&<p className={styles.error}>{orderErrors.description}</p>}
-            <Input label="Status" name="status" value={orderForm.status} onChange={handleOrderChange}/> {orderErrors.status&&<p className={styles.error}>{orderErrors.status}</p>}
+            <Input label="Description" name="description" value={orderForm.description} onChange={handleOrderChange}/>
+            {orderErrors.description && <p className={styles.error}>{orderErrors.description}</p>}
+            <Input label="Status" name="status" value={orderForm.status} onChange={handleOrderChange}/>
+            {orderErrors.status && <p className={styles.error}>{orderErrors.status}</p>}
             <Input label="Feedback" name="admin_feedback" value={orderForm.admin_feedback} onChange={handleOrderChange}/>
             <Button type="submit">Salvar Order</Button>
           </form>
         )}
-
       </section>
+
+      {/* Botão para mostrar/ocultar form de empresa */}
+      <div className={styles.buttons} style={{ marginTop: '2rem' }}>
+        <Button onClick={() => setShowCompanyForm(s => !s)}>
+          {showCompanyForm ? 'Cancelar Edição' : 'Editar Empresa'}
+        </Button>
+      </div>
+
+      {/* Form de edição da empresa (condicional) */}
+      {showCompanyForm && (
+        <>
+          <h1 className={styles.title}>Editar Empresa</h1>
+          <form className={styles.form} onSubmit={handleUpdate} noValidate>
+            <Input label="Nome" name="name" value={form.name} onChange={handleChange}/>
+            {errors.name && <p className={styles.error}>{errors.name}</p>}
+
+            <Input label="CNPJ" name="cnpj" value={form.cnpj} onChange={handleChange}/>
+            {errors.cnpj && <p className={styles.error}>{errors.cnpj}</p>}
+
+            <Input label="CEP" name="cep" value={form.cep} onChange={handleChange}/>
+            {errors.cep && <p className={styles.error}>{errors.cep}</p>}
+
+            <Input label="Rua" name="street" value={form.street} onChange={handleChange}/>
+            {errors.street && <p className={styles.error}>{errors.street}</p>}
+
+            <Input label="Número" name="number" type="text" value={form.number} onChange={handleChange}/>
+            {errors.number && <p className={styles.error}>{errors.number}</p>}
+
+            <Input label="Cidade" name="city" value={form.city} onChange={handleChange}/>
+            {errors.city && <p className={styles.error}>{errors.city}</p>}
+
+            <Input label="Estado" name="state" value={form.state} onChange={handleChange} maxLength={2}/>
+            {errors.state && <p className={styles.error}>{errors.state}</p>}
+
+            <div className={styles.buttons}>
+              <Button type="submit">Salvar</Button>
+              <Button type="button" onClick={handleDelete}>Excluir</Button>
+            </div>
+          </form>
+        </>
+      )}
     </div>
   );
 }

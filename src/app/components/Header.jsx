@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { User as UserIcon } from 'lucide-react';
 import styles from '../Global.module.css';
 
 export default function Header() {
@@ -16,20 +17,31 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      {showHomeButton && (
-        <button
-          type="button"
-          className={styles.button}
-          onClick={() => router.push('/dashboard')}
-        >
-          Home
-        </button>
-      )}
-      {showGreeting && (
-        <div>
+      <div className={styles.headerLeft}>
+        {showHomeButton && (
+          <button
+            type="button"
+            className={styles.button_home}
+            onClick={() => router.push('/dashboard')}
+          >
+            Home
+          </button>
+        )}
+        {showGreeting && (
           <h1 className={styles.title}>Olá, {user.name}!</h1>
-        </div>
-      )}
+        )}
+      </div>
+      <div className={styles.headerRight}>
+        {user && (
+          <button
+            type="button"
+            className={styles.iconButton}
+            onClick={() => router.push('/profile')}
+          >
+            <UserIcon size={24} />
+          </button>
+        )}
+      </div>
     </header>
   );
 }
