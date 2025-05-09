@@ -9,19 +9,24 @@ import styles from '../../../../../Global.module.css';
 
 export default function OrderPage() {
   const router = useRouter();
-  const { companyId, orderId } = useParams();    // <-- corrige aqui
+  const { companyId, orderId } = useParams();
   const { user } = useAuth();
 
   const [order, setOrder] = useState(null);
   const [orderForm, setOrderForm] = useState({ status: '', admin_feedback: '' });
   const [items, setItems] = useState([]);
+
+  // controla a visibilidade do form de itens (já existente)
   const [showItemForm, setShowItemForm] = useState(false);
   const [itemForm, setItemForm] = useState({ code: '', product: '', price: '', quantity: '', ean_code: '' });
   const [itemErrors, setItemErrors] = useState({});
 
+  // novo estado para mostrar/ocultar o form de edição do pedido
+  const [showOrderEditForm, setShowOrderEditForm] = useState(false);
+
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  // carrega o pedido e o form de edição
+  // carrega o pedido e preenche o form
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -33,7 +38,7 @@ export default function OrderPage() {
     })();
   }, [user, orderId]);
 
-  // carrega os itens
+  // carrega os itens do pedido
   useEffect(() => {
     if (!order) return;
     (async () => {
@@ -46,7 +51,7 @@ export default function OrderPage() {
 
   if (!order) return <p>Carregando pedido…</p>;
 
-  // --- Handlers do form de pedido ---
+  // handlers do form de pedido
   const handleOrderChange = (e) => {
     const { name, value } = e.target;
     setOrderForm(f => ({ ...f, [name]: value }));
@@ -54,7 +59,6 @@ export default function OrderPage() {
 
   const handleOrderUpdate = async (e) => {
     e.preventDefault();
-    // opcional: validações de status/admin_feedback aqui
     const res = await fetch(`${API}/v1/orders/${orderId}`, {
       method: 'PATCH',
       credentials: 'include',
@@ -64,7 +68,7 @@ export default function OrderPage() {
     if (res.ok) {
       const { order: updated } = await res.json();
       setOrder(updated);
-      router.push(`/dashboard/companies/${companyId}`); // ou onde fizer sentido
+      router.push(`/dashboard/companies/${companyId}`);
     }
   };
 
@@ -77,35 +81,14 @@ export default function OrderPage() {
     router.push(`/dashboard/companies/${companyId}`);
   };
 
-  // --- resto do código de itemForm (igual ao seu) ---
+  // handlers do form de item (não mostrado aqui)
+  const handleItemSave = async (e) => {
+    e.preventDefault();
+    // validações e POST para criar item...
+  };
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Editar Pedido #{order.id}</h1>
-
-      {/* === FORM DE EDIÇÃO DO PEDIDO === */}
-      <form className={styles.form} onSubmit={handleOrderUpdate} noValidate>
-        <Input
-          label="Status"
-          name="status"
-          value={orderForm.status}
-          onChange={handleOrderChange}
-        />
-        <Input
-          label="Feedback do Admin"
-          name="admin_feedback"
-          value={orderForm.admin_feedback}
-          onChange={handleOrderChange}
-        />
-
-        <div className={styles.buttons}>
-          <Button type="submit">Salvar Pedido</Button>
-          <Button type="button" onClick={handleOrderDelete}>
-            Excluir Pedido
-          </Button>
-        </div>
-      </form>
-
       {/* === SEÇÃO DE ITENS DO PEDIDO === */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Itens do Pedido</h2>
@@ -150,7 +133,7 @@ export default function OrderPage() {
           </tbody>
         </table>
 
-        <Button onClick={() => setShowItemForm((f) => !f)}>
+        <Button onClick={() => setShowItemForm(f => !f)}>
           {showItemForm ? 'Cancelar' : 'Adicionar Item'}
         </Button>
 
@@ -160,6 +143,41 @@ export default function OrderPage() {
           </form>
         )}
       </section>
+
+      {/* Botão para mostrar/ocultar o form de edição do pedido */}
+      <div className={styles.buttons} style={{ marginTop: '2rem' }}>
+        <Button onClick={() => setShowOrderEditForm(s => !s)}>
+          {showOrderEditForm ? 'Cancelar Edição' : `Editar Pedido #${order.id}`}
+        </Button>
+      </div>
+
+      {/* Form de edição do pedido (condicional) */}
+      {showOrderEditForm && (
+        <>
+          <h1 className={styles.title}>Editar Pedido #{order.id}</h1>
+          <form className={styles.form} onSubmit={handleOrderUpdate} noValidate>
+            <Input
+              label="Status"
+              name="status"
+              value={orderForm.status}
+              onChange={handleOrderChange}
+            />
+            <Input
+              label="Feedback do Admin"
+              name="admin_feedback"
+              value={orderForm.admin_feedback}
+              onChange={handleOrderChange}
+            />
+
+            <div className={styles.buttons}>
+              <Button type="submit">Salvar Pedido</Button>
+              <Button type="button" onClick={handleOrderDelete}>
+                Excluir Pedido
+              </Button>
+            </div>
+          </form>
+        </>
+      )}
     </div>
   );
 }
