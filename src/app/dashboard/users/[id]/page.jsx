@@ -213,7 +213,7 @@ export default function UserEditPage() {
           <option value="promoter">promoter</option>
         </Input>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div>
           <Button type="button" variant="destructive" onClick={handleDelete}>
             Excluir Usuário
           </Button>

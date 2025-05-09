@@ -6,7 +6,7 @@ export default function LoginPage() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Bem-vindo à Pétala</h1>
+        <h1 className={styles.title}>Pétala Representações Comerciais</h1>
         <LoginForm />
       </div>
     </div>

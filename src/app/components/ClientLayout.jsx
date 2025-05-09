@@ -9,10 +9,8 @@ export default function ClientLayout({ children }) {
   return (
     <AuthProvider>
       <Header />
-
-        <BackButton />
-        {children}
-
+      <BackButton />
+      {children}
       <Footer />
     </AuthProvider>
   );

@@ -165,7 +165,7 @@ export default function UserForm({
         <option value="promoter">promoter</option>
       </Input>
 
-      <div style={{ display: 'flex', justifyContent: isEdit ? 'space-between' : 'center' }}>
+      <div>
         {isEdit && (
           <Button type="button" variant="destructive" onClick={handleDelete}>
             Excluir Usuário

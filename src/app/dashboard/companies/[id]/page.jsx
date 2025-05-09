@@ -206,7 +206,7 @@ export default function CompanyPage() {
       </section>
 
       {/* Botão para mostrar/ocultar form de empresa */}
-      <div className={styles.buttons} style={{ marginTop: '2rem' }}>
+      <div className={styles.buttons}>
         <Button onClick={() => setShowCompanyForm(s => !s)}>
           {showCompanyForm ? 'Cancelar Edição' : 'Editar Empresa'}
         </Button>

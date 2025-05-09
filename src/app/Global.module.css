@@ -1,9 +1,5 @@
 .button {
-  display: block;
-  margin: 0 auto;
-  line-height: 28pt;
-  padding: 0 20px;
-  letter-spacing: 2px;
+  padding: 10px;
   transition: .2s all ease-in-out;
   outline: none;
   border: 1px solid rgba(0, 0, 0, 1);
@@ -18,6 +14,9 @@
     #a8edea 100%
   );
   background-position: left center;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
 }
 .button:disabled {
   cursor: not-allowed;
@@ -30,7 +29,7 @@
   background-position: right center;
   transform: translateY(-3px);
 }
-.button_home {
+.buttonHome {
   display: block;
   margin: 0 auto;
   padding: 0 20px;
@@ -39,7 +38,7 @@
   cursor: pointer;
   background: none;
 }
-.button_home:hover {
+.buttonHome:hover {
   font-weight: bolder;
 }
 
@@ -52,7 +51,7 @@
 .table td {
   text-align: left;
   padding: 0.75rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid lightgray;
 }
 .noData {
   text-align: center;
@@ -70,8 +69,7 @@
 .form {
   margin-top: 1rem;
   padding: 1rem;
-  background: #f7f9fc;
-  border-radius: 6px;
+  border: 1px solid lightgray;
 }
 .form > *:not(:last-child) {
   margin-bottom: 0.75rem;
@@ -81,7 +79,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1.5rem;
+  padding: 3em 6em;
+  width: 100%;
 }
 
 /* Agrupa botão Home + saudação */
@@ -120,19 +119,15 @@
   display: block;
   width: 100%;
   font-size: 14pt;
-  line-height: 28pt;            /* 2 × 14pt */
-  margin-bottom: 28pt;          /* 2 × 14pt */
-  min-width: 250px;
-  padding-left: 5px;
-  background: #f8f4e5;
+  margin-bottom: 28pt;
   border: none;
-  border-bottom: 5px solid rgba(0, 0, 0, 1);
+  border-bottom: 1px solid lightgray;
   outline: none;
-  color: rgba(0, 0, 0, 1);
+  padding: 10px;
 }
 
 .input:focus {
-  border-bottom: 5px solid #ffa580;
+  border-bottom: 2px solid lightskyblue;
 }
 
 /* 7) LoginForm */
@@ -179,9 +174,8 @@
   margin-top: 0.25rem;
 }
 
-
 .container {
-  padding: 2rem;
+  padding: 3em 6em;
 }
 
 .title {
@@ -197,8 +191,8 @@
 .section {
   background: #fff;
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid lightgray;
+  margin-bottom: 20px;
 }
 
 .sectionTitle {
@@ -219,4 +213,14 @@
 
 .addButton:hover {
   background-color: #005bb5;
+}
+
+.footer {
+  color: black;
+  padding: 10px;
+  bottom: 0;
+  width: 100%;
+  font-family: "Special Gothic Expanded One", sans-serif;
+  font-size: 14px;
+  padding: 3em 6em;
 }

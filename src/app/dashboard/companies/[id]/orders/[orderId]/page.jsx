@@ -145,7 +145,7 @@ export default function OrderPage() {
       </section>
 
       {/* Botão para mostrar/ocultar o form de edição do pedido */}
-      <div className={styles.buttons} style={{ marginTop: '2rem' }}>
+      <div className={styles.buttons}>
         <Button onClick={() => setShowOrderEditForm(s => !s)}>
           {showOrderEditForm ? 'Cancelar Edição' : `Editar Pedido #${order.id}`}
         </Button>

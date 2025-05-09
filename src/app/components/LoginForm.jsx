@@ -32,8 +32,7 @@ export default function LoginForm() {
   return (
     <section>
       <p>
-        Welcome Back
-        Log in to your account using email and password
+        Bem-vindo de volta Entre na sua conta usando e-mail e senha
       </p>
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <p className={styles.error}>{error}</p>}

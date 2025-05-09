@@ -21,7 +21,7 @@ export default function Header() {
         {showHomeButton && (
           <button
             type="button"
-            className={styles.button_home}
+            className={styles.buttonHome}
             onClick={() => router.push('/dashboard')}
           >
             Home

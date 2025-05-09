@@ -184,7 +184,7 @@ export default function ProfilePage() {
           <option value="promoter">promoter</option>
         </Input>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+        <div>
           <Button variant="destructive" type="button" onClick={handleDelete}>
             Excluir Conta
           </Button>

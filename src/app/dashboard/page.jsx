@@ -89,7 +89,7 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Dashboard</h1>
+      <p className={styles.title}>Este é o seu dashboard.</p>
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Empresas</h2>
@@ -107,7 +107,7 @@ export default function DashboardPage() {
       </section>
 
       {user.role === 'admin' && (
-        <section className={styles.section} style={{ marginTop: '2rem' }}>
+        <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Usuários</h2>
 
           <UsersTable users={users} />
