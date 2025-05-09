@@ -30,7 +30,6 @@ export default function DashboardPage() {
       .catch(console.error);
   }, [user]);
 
-  // buscar lista de usuários ao montar, se for admin
   useEffect(() => {
     if (!user || user.role !== 'admin') return;
     fetch(`${API_URL}/v1/users`, {

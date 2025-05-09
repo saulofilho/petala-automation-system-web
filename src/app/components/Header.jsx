@@ -1,4 +1,3 @@
-// app/src/app/components/Header.jsx
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
@@ -9,11 +8,15 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
-  const showBack = pathname !== '/dashboard';
+  const isRoot = pathname === '/';
+  const isDashboard = pathname === '/dashboard';
+
+  const showHomeButton = !isRoot && !isDashboard;
+  const showGreeting = isDashboard && !!user;
 
   return (
     <header className={styles.header}>
-      {showBack ? (
+      {showHomeButton && (
         <button
           type="button"
           className={styles.button}
@@ -21,7 +24,8 @@ export default function Header() {
         >
           Home
         </button>
-      ) : (
+      )}
+      {showGreeting && (
         <div>
           <h1 className={styles.title}>Olá, {user.name}!</h1>
         </div>

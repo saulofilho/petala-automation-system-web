@@ -7,7 +7,6 @@ import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import styles from '../../../Global.module.css';
 
-// Regex e máscaras
 const CNPJ_REGEX = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
 const CEP_REGEX = /^\d{5}-\d{3}$/;
 const STATE_REGEX = /^[A-Z]{2}$/;
@@ -21,13 +20,11 @@ export default function CompanyPage() {
   const { id: companyId } = useParams();
   const { user, logout } = useAuth();
 
-  // Company form state
   const [form, setForm] = useState({ name:'', cnpj:'', cep:'', street:'', number:'', city:'', state:'' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  // Orders state
   const [orders, setOrders] = useState([]);
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [orderForm, setOrderForm] = useState({ description: '', status:'pending', admin_feedback:'' });
@@ -35,7 +32,6 @@ export default function CompanyPage() {
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-  // Fetch company details
   useEffect(()=>{
     if(!user||!companyId) return;
     (async ()=>{
@@ -51,7 +47,6 @@ export default function CompanyPage() {
     })();
   },[user,companyId]);
 
-  // Fetch orders once company loaded
   useEffect(()=>{
     if(loading||notFound) return;
     (async ()=>{
@@ -64,7 +59,6 @@ export default function CompanyPage() {
     })();
   },[loading,notFound]);
 
-  // Company validation & handlers
   const validateCompany=()=>{
     const e={};
     if(!form.name.trim()) e.name='Nome é obrigatório';
@@ -76,6 +70,7 @@ export default function CompanyPage() {
     if(!STATE_REGEX.test(form.state)) e.state='Estado inválido';
     return e;
   };
+
   const handleChange=(e)=>{
     let v=e.target.value;
     if(e.target.name==='cnpj') v=maskCNPJ(v);
@@ -85,6 +80,7 @@ export default function CompanyPage() {
     setForm(f=>({...f,[e.target.name]:v}));
     setErrors(err=>({...err,[e.target.name]:null}));
   };
+
   const handleUpdate=async(e)=>{
     e.preventDefault();const ev=validateCompany();if(Object.keys(ev).length){setErrors(ev);return;}    
     await fetch(`${API}/v1/companies/${companyId}`,{
@@ -93,18 +89,20 @@ export default function CompanyPage() {
     });
     router.push('/dashboard');
   };
+
   const handleDelete=async()=>{if(!confirm('Confirma exclusão?'))return;await fetch(`${API}/v1/companies/${companyId}`,{method:'DELETE',credentials:'include'});router.push('/dashboard');};
 
-  // Order validation & handlers
   const validateOrder=()=>{
     const e={};
     if(!orderForm.status.trim()) e.status='Status é obrigatório';
     return e;
   };
+
   const handleOrderChange=e=>{
     setOrderForm(o=>({...o,[e.target.name]:e.target.value}));
     setOrderErrors(err=>({...err,[e.target.name]:null}));
   };
+  
   const handleOrderCreate=async(e)=>{
     e.preventDefault();const ev=validateOrder();if(Object.keys(ev).length){setOrderErrors(ev);return;}    
     const res=await fetch(`${API}/v1/companies/${companyId}/orders`,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({order:{...orderForm,company_id:Number(companyId)}})});

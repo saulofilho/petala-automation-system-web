@@ -1,7 +1,5 @@
 import './globals.css';
-import { AuthProvider } from './context/AuthContext';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import ClientLayout from './components/ClientLayout';
 
 export const metadata = {
   title: 'Pétala Comercial',
@@ -12,11 +10,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">
       <body>
-        <AuthProvider>
-          <Header />
+        <ClientLayout>
           {children}
-          <Footer />
-        </AuthProvider>
+        </ClientLayout>
       </body>
     </html>
   );

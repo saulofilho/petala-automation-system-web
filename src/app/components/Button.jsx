@@ -1,4 +1,3 @@
-// app/src/app/components/Button.jsx
 'use client';
 
 import styles from '../Global.module.css';
