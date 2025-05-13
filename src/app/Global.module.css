@@ -1,29 +1,32 @@
+.dateTime {
+  font-size: 1rem;
+  color: #666;
+  margin-top: 0.25rem;
+  font-family: "Nunito Sans", sans-serif;
+  color: #8E7DBE;
+}
+
 .button {
   padding: 10px;
   transition: .2s all ease-in-out;
   outline: none;
-  border: 1px solid rgba(0, 0, 0, 1);
-  box-shadow:
-    3px 3px 1px 1px #ffc3e3,
-    3px 3px 1px 2px rgba(0, 0, 0, 1);
+  border-radius: 8px;
+  border: none;
   cursor: pointer;
-  background: linear-gradient(
-    90deg,
-    #fad0c4 0%,
-    #ffd1ff 50%,
-    #a8edea 100%
-  );
-  background-position: left center;
   display: flex;
   justify-content: flex-start;
-  margin-top: 1rem;
+  margin-top: 3rem;
+  /* background: #F7CFD8; */
+  background: #F4F8D3;
+  /* background: #A6D6D6;
+  background: #8E7DBE; */
 }
 .button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 .button:not(:disabled):hover {
-  background-color: #005bb5;
+  background-color: #A6D6D6;
 }
 .button:hover {
   background-position: right center;
@@ -70,6 +73,7 @@
   margin-top: 1rem;
   padding: 1rem;
   border: 1px solid lightgray;
+  background: white;
 }
 .form > *:not(:last-child) {
   margin-bottom: 0.75rem;
@@ -81,6 +85,7 @@
   align-items: center;
   padding: 3em 6em;
   width: 100%;
+  font-family: "DM Serif Text", serif;
 }
 
 /* Agrupa botão Home + saudação */
@@ -102,6 +107,7 @@
   border: none;
   cursor: pointer;
   padding: 0.25rem;
+  color: #8E7DBE;
 }
 
 /* 6) Inputs e wrappers */
@@ -127,7 +133,7 @@
 }
 
 .input:focus {
-  border-bottom: 2px solid lightskyblue;
+  border-bottom: 2px solid #8E7DBE;
 }
 
 /* 7) LoginForm */
@@ -179,8 +185,9 @@
 }
 
 .title {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  margin-bottom: 3rem;
+  color: gray;
 }
 
 .loading {
@@ -196,8 +203,10 @@
 }
 
 .sectionTitle {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  font-weight: 400;
+  color: gray;
 }
 
 .addButton {
@@ -205,7 +214,6 @@
   padding: 0.75rem 1.25rem;
   border: none;
   border-radius: 4px;
-  background-color: #0070f3;
   color: #fff;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -220,7 +228,78 @@
   padding: 10px;
   bottom: 0;
   width: 100%;
-  font-family: "Special Gothic Expanded One", sans-serif;
   font-size: 14px;
   padding: 3em 6em;
+}
+
+@media (max-width: 768px) {
+  /* Header: empilha conteúdo e reduz padding */
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2em 1em;
+  }
+  .headerLeft,
+  .headerRight {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  /* Container geral */
+  .container {
+    padding: 2em 1em;
+  }
+
+  /* Seções e formulários ficam com padding reduzido e margem menor */
+  .section,
+  .form {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Botões ocupam 100% de largura e centralizam texto */
+  .button,
+  .addButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Tabelas ganham scroll horizontal */
+  .table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Inputs e formulários */
+  .input {
+    font-size: 12pt;
+  }
+  .userForm,
+  .loginForm {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Ajustes adicionais para smartphones */
+  .header {
+    padding: 1.5em 0.5em;
+  }
+  .headerLeft,
+  .headerRight {
+    margin-bottom: 0.5rem;
+  }
+  .title {
+    font-size: 1rem;
+  }
+  .button,
+  .addButton {
+    padding: 0.5rem;
+  }
+  .input {
+    padding: 0.75rem;
+  }
 }

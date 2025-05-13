@@ -89,10 +89,12 @@ export default function DashboardPage() {
 
   return (
     <div className={styles.container}>
-      <p className={styles.title}>Este é o seu dashboard.</p>
+      <p className={styles.title}>
+        Este é o seu dashboard, onde você acompanha indicadores-chave como número de empresas cadastradas, orçamentos pendentes e status de abastecimento, além de gerenciar empresas e seus históricos, criar, enviar e monitorar orçamentos, manter o catálogo de produtos e registrar e visualizar abastecimentos; para administradores, também é possível controlar usuários e permissões.
+      </p>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Empresas</h2>
+        <h2 className={styles.sectionTitle}>As suas empresas</h2>
 
         <CompaniesTable companies={companies} />
 
@@ -108,7 +110,7 @@ export default function DashboardPage() {
 
       {user.role === 'admin' && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Usuários</h2>
+          <h2 className={styles.sectionTitle}>Usuários cadastrados no sistema</h2>
 
           <UsersTable users={users} />
 

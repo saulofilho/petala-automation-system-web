@@ -15,18 +15,34 @@ export default function OrderPage() {
   const [order, setOrder] = useState(null);
   const [orderForm, setOrderForm] = useState({ status: '', admin_feedback: '' });
   const [items, setItems] = useState([]);
-
-  // controla a visibilidade do form de itens (já existente)
   const [showItemForm, setShowItemForm] = useState(false);
-  const [itemForm, setItemForm] = useState({ code: '', product: '', price: '', quantity: '', ean_code: '' });
+  const [itemForm, setItemForm] = useState({ code: '', product: '', price: '', quantity: '', ean_code: '', order_id: ''});
   const [itemErrors, setItemErrors] = useState({});
-
-  // novo estado para mostrar/ocultar o form de edição do pedido
   const [showOrderEditForm, setShowOrderEditForm] = useState(false);
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  // carrega o pedido e preenche o form
+  // Hook para download de PDF deve vir antes de retornos condicionais
+  const handleDownloadPdf = async () => {
+    if (!order) return; // garante que order existe
+    try {
+      const res = await fetch(`${API}/v1/orders/${orderId}/pdf`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Falha ao gerar PDF');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `pedido_${order.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // carrega o pedido
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -38,7 +54,7 @@ export default function OrderPage() {
     })();
   }, [user, orderId]);
 
-  // carrega os itens do pedido
+  // carrega itens do pedido
   useEffect(() => {
     if (!order) return;
     (async () => {
@@ -51,7 +67,6 @@ export default function OrderPage() {
 
   if (!order) return <p>Carregando pedido…</p>;
 
-  // handlers do form de pedido
   const handleOrderChange = (e) => {
     const { name, value } = e.target;
     setOrderForm(f => ({ ...f, [name]: value }));
@@ -74,106 +89,147 @@ export default function OrderPage() {
 
   const handleOrderDelete = async () => {
     if (!confirm('Confirma exclusão deste pedido?')) return;
-    await fetch(`${API}/v1/orders/${orderId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
+    await fetch(`${API}/v1/orders/${orderId}`, { method: 'DELETE', credentials: 'include' });
     router.push(`/dashboard/companies/${companyId}`);
   };
 
-  // handlers do form de item (não mostrado aqui)
+  const handleItemChange = (e) => {
+    const { name, value } = e.target;
+    setItemForm(f => ({ ...f, [name]: value }));
+  };
+
   const handleItemSave = async (e) => {
     e.preventDefault();
-    // validações e POST para criar item...
+    console.log('Salvando item…', itemForm);
+
+    try {
+      const res = await fetch(
+        `${API}/v1/orders/${orderId}/order_items`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order_item: { 
+            ...itemForm,
+            order_id: orderId
+          } }),
+        }
+      );
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        setItemErrors(errorData.errors || {});
+        return;
+      }
+
+      const { order_item: newItem } = await res.json();
+
+      // atualiza lista localmente
+      setItems((prev) => [...prev, newItem]);
+
+      // limpa form e fecha
+      setItemForm({
+        code: '',
+        product: '',
+        price: '',
+        quantity: '',
+        ean_code: '',
+        order_id: ''
+      });
+      setItemErrors({});
+      setShowItemForm(false);
+
+    } catch (err) {
+      alert('Erro ao salvar item: ' + err.message);
+    }
   };
 
   return (
     <div className={styles.container}>
-      {/* === SEÇÃO DE ITENS DO PEDIDO === */}
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Itens do Pedido</h2>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Código</th>
-              <th>Produto</th>
-              <th>Preço</th>
-              <th>Quantidade</th>
-              <th>EAN</th>
+              <th>ID</th><th>Código</th><th>Produto</th><th>Preço</th><th>Quantidade</th><th>EAN</th><th>Company ID</th>
             </tr>
           </thead>
           <tbody>
             {items.length === 0 ? (
-              <tr key="no-items">
-                <td colSpan={6} className={styles.noData}>
-                  Nenhum item.
-                </td>
-              </tr>
+              <tr key="no-items"><td colSpan={7} className={styles.noData}>Nenhum item.</td></tr>
             ) : (
-              items.map((it) => (
-                <tr
-                  key={it.id}
-                  className={styles.row}
-                  onClick={() =>
-                    router.push(
-                      `/dashboard/companies/${companyId}/orders/${orderId}/order_items/${it.id}`
-                    )
-                  }
-                >
-                  <td>{it.id}</td>
-                  <td>{it.code}</td>
-                  <td>{it.product}</td>
-                  <td>{it.price}</td>
-                  <td>{it.quantity}</td>
-                  <td>{it.ean_code}</td>
+              items.map(it => (
+                <tr key={it.id} className={styles.row} onClick={() => router.push(
+                  `/dashboard/companies/${companyId}/orders/${orderId}/order_items/${it.id}`)}>
+                  <td>{it.id}</td><td>{it.code}</td><td>{it.product}</td>
+                  <td>{it.price}</td><td>{it.quantity}</td><td>{it.ean_code}</td>
+                  <td>{it.order_id}</td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-
         <Button onClick={() => setShowItemForm(f => !f)}>
           {showItemForm ? 'Cancelar' : 'Adicionar Item'}
         </Button>
-
         {showItemForm && (
           <form className={styles.form} onSubmit={handleItemSave} noValidate>
-            {/* seu form de itemForm… */}
+            <Input
+              label="Código"
+              name="code"
+              value={itemForm.code}
+              onChange={handleItemChange}
+            />
+            <Input
+              label="Produto"
+              name="product"
+              value={itemForm.product}
+              onChange={handleItemChange}
+            />
+            <Input
+              label="Preço"
+              name="price"
+              type="number"
+              value={itemForm.price}
+              onChange={handleItemChange}
+            />
+            <Input
+              label="Quantidade"
+              name="quantity"
+              type="number"
+              value={itemForm.quantity}
+              onChange={handleItemChange}
+            />
+            <Input
+              label="EAN"
+              name="ean_code"
+              value={itemForm.ean_code}
+              onChange={handleItemChange}
+            />
+            <div className={styles.buttons}>
+              <Button type="submit">Salvar Item</Button>
+              <Button type="button" onClick={() => setShowItemForm(false)}>Cancelar</Button>
+            </div>
           </form>
         )}
       </section>
 
-      {/* Botão para mostrar/ocultar o form de edição do pedido */}
       <div className={styles.buttons}>
         <Button onClick={() => setShowOrderEditForm(s => !s)}>
           {showOrderEditForm ? 'Cancelar Edição' : `Editar Pedido #${order.id}`}
         </Button>
+        <Button onClick={handleDownloadPdf}>Baixar PDF</Button>
       </div>
 
-      {/* Form de edição do pedido (condicional) */}
       {showOrderEditForm && (
         <>
           <h1 className={styles.title}>Editar Pedido #{order.id}</h1>
           <form className={styles.form} onSubmit={handleOrderUpdate} noValidate>
-            <Input
-              label="Status"
-              name="status"
-              value={orderForm.status}
-              onChange={handleOrderChange}
-            />
-            <Input
-              label="Feedback do Admin"
-              name="admin_feedback"
-              value={orderForm.admin_feedback}
-              onChange={handleOrderChange}
-            />
-
+            <Input label="Status" name="status" value={orderForm.status} onChange={handleOrderChange} />
+            <Input label="Feedback do Admin" name="admin_feedback" value={orderForm.admin_feedback} onChange={handleOrderChange} />
             <div className={styles.buttons}>
               <Button type="submit">Salvar Pedido</Button>
-              <Button type="button" onClick={handleOrderDelete}>
-                Excluir Pedido
-              </Button>
+              <Button type="button" onClick={handleOrderDelete}>Excluir Pedido</Button>
             </div>
           </form>
         </>

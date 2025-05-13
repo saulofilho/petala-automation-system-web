@@ -121,7 +121,7 @@ export default function UserEditPage() {
     const payload = { ...form };
     try {
       const res = await fetch(`${API_URL}/v1/users/${id}`, {
-        method: 'PUT', // ou PATCH, conforme sua API
+        method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user: payload }),
@@ -157,7 +157,7 @@ export default function UserEditPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Editar Usuário #{id}</h1>
+      <h1 className={styles.title}>Editar usuário: {form.name}</h1>
       <form onSubmit={handleSubmit} className={styles.userForm} noValidate>
         <Input
           label="Email"
@@ -214,10 +214,10 @@ export default function UserEditPage() {
         </Input>
 
         <div>
+          <Button type="submit">Salvar Alterações</Button>
           <Button type="button" variant="destructive" onClick={handleDelete}>
             Excluir Usuário
           </Button>
-          <Button type="submit">Salvar Alterações</Button>
         </div>
       </form>
     </div>
