@@ -161,7 +161,7 @@ export default function UserForm({
         onChange={handleChange}
       >
         <option value="admin">admin</option>
-        <option value="client">client</option>
+        <option value="manager">manager</option>
         <option value="promoter">promoter</option>
       </Input>
 
