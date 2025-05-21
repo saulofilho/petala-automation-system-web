@@ -24,7 +24,6 @@ export default function OrderItemPage() {
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
 
-  // Fetch order item
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -54,7 +53,6 @@ export default function OrderItemPage() {
   if (loading) return <p>Carregando item…</p>;
   if (!item) return <p>Item não encontrado.</p>;
 
-  // Handlers
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(f => ({ ...f, [name]: value }));
@@ -63,11 +61,9 @@ export default function OrderItemPage() {
 
   const validate = () => {
     const errs = {};
-    // product: não vazio
     if (!form.product.trim()) {
       errs.product = 'Produto é obrigatório';
     }
-    // price: número entre 10 e 100
     const price = parseFloat(form.price);
     if (form.price === '' || isNaN(price)) {
       errs.price = 'Preço é obrigatório e deve ser numérico';
@@ -111,7 +107,7 @@ export default function OrderItemPage() {
     if (!confirm('Deseja excluir este item?')) return;
     try {
       await fetch(
-        `${API}/v1/orders/${orderId}/order_items/${orderItemId}`,
+        `${API}/v1/order_items/${orderItemId}`,
         { method: 'DELETE', credentials: 'include' }
       );
       router.push(`/dashboard/companies/${companyId}/orders/${orderId}`);

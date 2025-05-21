@@ -16,15 +16,18 @@ export default function OrderPage() {
   const [orderForm, setOrderForm] = useState({ status: '', admin_feedback: '' });
   const [items, setItems] = useState([]);
   const [showItemForm, setShowItemForm] = useState(false);
-  const [itemForm, setItemForm] = useState({ code: '', product: '', price: '', quantity: '', ean_code: '', order_id: ''});
+  const [itemForm, setItemForm] = useState({ code: '', product: '', price: '', quantity: '', ean_code: '', order_id: '' });
   const [itemErrors, setItemErrors] = useState({});
+
+  const [showImportForm, setShowImportForm] = useState(false);
+  const [importFile, setImportFile] = useState(null);
+  const [importErrors, setImportErrors] = useState(null);
   const [showOrderEditForm, setShowOrderEditForm] = useState(false);
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  // Hook para download de PDF deve vir antes de retornos condicionais
   const handleDownloadPdf = async () => {
-    if (!order) return; // garante que order existe
+    if (!order) return;
     try {
       const res = await fetch(`${API}/v1/orders/${orderId}/pdf`, { credentials: 'include' });
       if (!res.ok) throw new Error('Falha ao gerar PDF');
@@ -42,7 +45,6 @@ export default function OrderPage() {
     }
   };
 
-  // carrega o pedido
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -54,7 +56,6 @@ export default function OrderPage() {
     })();
   }, [user, orderId]);
 
-  // carrega itens do pedido
   useEffect(() => {
     if (!order) return;
     (async () => {
@@ -100,8 +101,6 @@ export default function OrderPage() {
 
   const handleItemSave = async (e) => {
     e.preventDefault();
-    console.log('Salvando item…', itemForm);
-
     try {
       const res = await fetch(
         `${API}/v1/orders/${orderId}/order_items`,
@@ -109,38 +108,63 @@ export default function OrderPage() {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order_item: { 
-            ...itemForm,
-            order_id: orderId
-          } }),
+          body: JSON.stringify({ order_item: { ...itemForm, order_id: orderId } }),
         }
       );
-
       if (!res.ok) {
         const errorData = await res.json();
         setItemErrors(errorData.errors || {});
         return;
       }
-
       const { order_item: newItem } = await res.json();
-
-      // atualiza lista localmente
-      setItems((prev) => [...prev, newItem]);
-
-      // limpa form e fecha
-      setItemForm({
-        code: '',
-        product: '',
-        price: '',
-        quantity: '',
-        ean_code: '',
-        order_id: ''
-      });
+      setItems(prev => [...prev, newItem]);
+      setItemForm({ code: '', product: '', price: '', quantity: '', ean_code: '', order_id: '' });
       setItemErrors({});
       setShowItemForm(false);
-
     } catch (err) {
       alert('Erro ao salvar item: ' + err.message);
+    }
+  };
+
+  const handleImportChange = (e) => {
+    setImportFile(e.target.files[0]);
+  };
+
+  const handleImportSubmit = async (e) => {
+    e.preventDefault();
+    if (!importFile) {
+      setImportErrors('Selecione um arquivo .xlsx');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', importFile);
+    try {
+      const res = await fetch(
+        `${API}/v1/orders/${orderId}/order_items/import`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        }
+      );
+      if (!res.ok) {
+        const data = await res.json();
+        setImportErrors(data.message || 'Erro no import');
+        return;
+      }
+      const listRes = await fetch(
+        `${API}/v1/orders/${orderId}/order_items`,
+        { credentials: 'include' }
+      );
+      if (listRes.ok) {
+        const { order_items } = await listRes.json();
+        setItems(order_items);
+      }
+      setImportFile(null);
+      setImportErrors(null);
+      setShowImportForm(false);
+    } catch (err) {
+      setImportErrors(err.message);
     }
   };
 
@@ -148,67 +172,66 @@ export default function OrderPage() {
     <div className={styles.container}>
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Itens do Pedido</h2>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>ID</th><th>Código</th><th>Produto</th><th>Preço</th><th>Quantidade</th><th>EAN</th><th>Company ID</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.length === 0 ? (
-              <tr key="no-items"><td colSpan={7} className={styles.noData}>Nenhum item.</td></tr>
-            ) : (
-              items.map(it => (
-                <tr key={it.id} className={styles.row} onClick={() => router.push(
-                  `/dashboard/companies/${companyId}/orders/${orderId}/order_items/${it.id}`)}>
-                  <td>{it.id}</td><td>{it.code}</td><td>{it.product}</td>
-                  <td>{it.price}</td><td>{it.quantity}</td><td>{it.ean_code}</td>
-                  <td>{it.order_id}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-        <Button onClick={() => setShowItemForm(f => !f)}>
-          {showItemForm ? 'Cancelar' : 'Adicionar Item'}
-        </Button>
+        <div class="table-responsive">
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>ID</th><th>Código</th><th>Produto</th><th>Preço</th><th>Quantidade</th><th>EAN</th><th>Order ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.length === 0 ? (
+                <tr><td colSpan={7} className={styles.noData}>Nenhum item.</td></tr>
+              ) : (
+                items.map(it => (
+                  <tr key={it.id} className={styles.row} onClick={() => router.push(
+                    `/dashboard/companies/${companyId}/orders/${orderId}/order_items/${it.id}`
+                  )}>
+                    <td>{it.id}</td><td>{it.code}</td><td>{it.product}</td>
+                    <td>{it.price}</td><td>{it.quantity}</td><td>{it.ean_code}</td><td>{it.order_id}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className={styles.buttons}>
+          <Button onClick={() => setShowItemForm(f => !f)}>
+            {showItemForm ? 'Cancelar' : 'Adicionar Item'}
+          </Button>
+          <Button onClick={() => setShowImportForm(f => !f)}>
+            {showImportForm ? 'Cancelar Import' : 'Importar Itens'}
+          </Button>
+        </div>
         {showItemForm && (
           <form className={styles.form} onSubmit={handleItemSave} noValidate>
-            <Input
-              label="Código"
-              name="code"
-              value={itemForm.code}
-              onChange={handleItemChange}
-            />
-            <Input
-              label="Produto"
-              name="product"
-              value={itemForm.product}
-              onChange={handleItemChange}
-            />
-            <Input
-              label="Preço"
-              name="price"
-              type="number"
-              value={itemForm.price}
-              onChange={handleItemChange}
-            />
-            <Input
-              label="Quantidade"
-              name="quantity"
-              type="number"
-              value={itemForm.quantity}
-              onChange={handleItemChange}
-            />
-            <Input
-              label="EAN"
-              name="ean_code"
-              value={itemForm.ean_code}
-              onChange={handleItemChange}
-            />
+            <Input label="Código" name="code" value={itemForm.code} onChange={handleItemChange} />
+            <Input label="Produto" name="product" value={itemForm.product} onChange={handleItemChange} />
+            <Input label="Preço" name="price" type="number" value={itemForm.price} onChange={handleItemChange} />
+            <Input label="Quantidade" name="quantity" type="number" value={itemForm.quantity} onChange={handleItemChange} />
+            <Input label="EAN" name="ean_code" value={itemForm.ean_code} onChange={handleItemChange} />
+            {Object.keys(itemErrors).length > 0 && (
+              <ul className={styles.errorList}>
+                {Object.entries(itemErrors).map(([field, msgs]) => (
+                  <li key={field}>{field}: {msgs.join(', ')}</li>
+                ))}
+              </ul>
+            )}
             <div className={styles.buttons}>
               <Button type="submit">Salvar Item</Button>
               <Button type="button" onClick={() => setShowItemForm(false)}>Cancelar</Button>
+            </div>
+          </form>
+        )}
+        {showImportForm && (
+          <form className={styles.form} onSubmit={handleImportSubmit} encType="multipart/form-data">
+            <input type="file" accept=".xlsx" name="file" onChange={handleImportChange} />
+            {importErrors && <p className={styles.error}>{importErrors}</p>}
+            <div className={styles.buttons}>
+              <Button type="submit">Enviar Arquivo</Button>
+              <Button type="button" onClick={() => { setShowImportForm(false); setImportErrors(null); }}>
+                Cancelar
+              </Button>
             </div>
           </form>
         )}

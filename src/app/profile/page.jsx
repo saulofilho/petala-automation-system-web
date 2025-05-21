@@ -41,12 +41,11 @@ export default function ProfilePage() {
     name: '',
     cpf: '',
     phone: '',
-    role: user?.role || 'client',
+    role: user?.role || 'admin',
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // 1) Preenche form com dados do usuário
   useEffect(() => {
     if (!user) return router.push('/');
     fetch(`${API_URL}/v1/users/${user.id}`, { credentials: 'include' })
@@ -179,9 +178,8 @@ export default function ProfilePage() {
           value={form.role}
           onChange={handleChange}
         >
-          <option value="admin">admin</option>
-          <option value="client">client</option>
-          <option value="promoter">promoter</option>
+          <option value="admin">Admin</option>
+          <option value="manager">Manager</option>
         </Input>
 
         <div>
