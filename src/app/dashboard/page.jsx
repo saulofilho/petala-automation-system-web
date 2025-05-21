@@ -90,7 +90,10 @@ export default function DashboardPage() {
   return (
     <div className={styles.container}>
       <p className={styles.title}>
-        Este é o seu dashboard, onde você acompanha indicadores-chave como número de empresas cadastradas, orçamentos pendentes e status de abastecimento, além de gerenciar empresas e seus históricos, criar, enviar e monitorar orçamentos, manter o catálogo de produtos e registrar e visualizar abastecimentos; para administradores, também é possível controlar usuários e permissões.
+        Este é o seu dashboard, onde você acompanha indicadores-chave como número de empresas cadastradas, orçamentos pendentes e status de abastecimento, além de gerenciar empresas e seus históricos, criar, enviar e monitorar orçamentos, manter o catálogo de produtos e registrar e visualizar abastecimentos.
+        <br/>
+        <br/>
+        Para administradores, também é possível controlar usuários e permissões.
       </p>
 
       <section className={styles.section}>

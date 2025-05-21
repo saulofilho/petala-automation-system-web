@@ -16,7 +16,15 @@ export default function OrderPage() {
   const [orderForm, setOrderForm] = useState({ status: '', admin_feedback: '' });
   const [items, setItems] = useState([]);
   const [showItemForm, setShowItemForm] = useState(false);
-  const [itemForm, setItemForm] = useState({ code: '', product: '', price: '', quantity: '', ean_code: '', order_id: '' });
+  const [itemForm, setItemForm] = useState({
+    code: '',
+    product: '',
+    price: '',
+    quantity: '',
+    total: '',
+    ean_code: '',
+    order_id: '',
+  });
   const [itemErrors, setItemErrors] = useState({});
 
   const [showImportForm, setShowImportForm] = useState(false);
@@ -118,7 +126,7 @@ export default function OrderPage() {
       }
       const { order_item: newItem } = await res.json();
       setItems(prev => [...prev, newItem]);
-      setItemForm({ code: '', product: '', price: '', quantity: '', ean_code: '', order_id: '' });
+      setItemForm({ code: '', product: '', price: '', quantity: '', total: '', ean_code: '', order_id: '' });
       setItemErrors({});
       setShowItemForm(false);
     } catch (err) {
@@ -172,23 +180,33 @@ export default function OrderPage() {
     <div className={styles.container}>
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Itens do Pedido</h2>
-        <div class="table-responsive">
+        <div className="table-responsive">
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>ID</th><th>Código</th><th>Produto</th><th>Preço</th><th>Quantidade</th><th>EAN</th><th>Order ID</th>
+                <th>ID</th>
+                <th>Código</th>
+                <th>Produto</th>
+                <th>Preço</th>
+                <th>Quantidade</th>
+                <th>Total</th>
+                <th>EAN</th>
+                <th>Order ID</th>
               </tr>
             </thead>
             <tbody>
               {items.length === 0 ? (
-                <tr><td colSpan={7} className={styles.noData}>Nenhum item.</td></tr>
+                <tr>
+                  <td colSpan={8} className={styles.noData}>Nenhum item.</td>
+                </tr>
               ) : (
                 items.map(it => (
                   <tr key={it.id} className={styles.row} onClick={() => router.push(
                     `/dashboard/companies/${companyId}/orders/${orderId}/order_items/${it.id}`
                   )}>
                     <td>{it.id}</td><td>{it.code}</td><td>{it.product}</td>
-                    <td>{it.price}</td><td>{it.quantity}</td><td>{it.ean_code}</td><td>{it.order_id}</td>
+                    <td>{it.price}</td><td>{it.quantity}</td><td>{it.total}</td>
+                    <td>{it.ean_code}</td><td>{it.order_id}</td>
                   </tr>
                 ))
               )}
@@ -203,13 +221,16 @@ export default function OrderPage() {
             {showImportForm ? 'Cancelar Import' : 'Importar Itens'}
           </Button>
         </div>
+
         {showItemForm && (
           <form className={styles.form} onSubmit={handleItemSave} noValidate>
             <Input label="Código" name="code" value={itemForm.code} onChange={handleItemChange} />
             <Input label="Produto" name="product" value={itemForm.product} onChange={handleItemChange} />
             <Input label="Preço" name="price" type="number" value={itemForm.price} onChange={handleItemChange} />
             <Input label="Quantidade" name="quantity" type="number" value={itemForm.quantity} onChange={handleItemChange} />
+            <Input label="Total" name="total" type="number" value={itemForm.total} onChange={handleItemChange} /> {/* Novo campo */}
             <Input label="EAN" name="ean_code" value={itemForm.ean_code} onChange={handleItemChange} />
+
             {Object.keys(itemErrors).length > 0 && (
               <ul className={styles.errorList}>
                 {Object.entries(itemErrors).map(([field, msgs]) => (
@@ -217,12 +238,14 @@ export default function OrderPage() {
                 ))}
               </ul>
             )}
+
             <div className={styles.buttons}>
               <Button type="submit">Salvar Item</Button>
               <Button type="button" onClick={() => setShowItemForm(false)}>Cancelar</Button>
             </div>
           </form>
         )}
+
         {showImportForm && (
           <form className={styles.form} onSubmit={handleImportSubmit} encType="multipart/form-data">
             <input type="file" accept=".xlsx" name="file" onChange={handleImportChange} />
