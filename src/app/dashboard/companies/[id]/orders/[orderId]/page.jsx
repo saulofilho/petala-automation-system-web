@@ -22,8 +22,7 @@ export default function OrderPage() {
     price: '',
     quantity: '',
     total: '',
-    ean_code: '',
-    order_id: '',
+    ean_code: ''
   });
   const [itemErrors, setItemErrors] = useState({});
 
@@ -31,6 +30,8 @@ export default function OrderPage() {
   const [importFile, setImportFile] = useState(null);
   const [importErrors, setImportErrors] = useState(null);
   const [showOrderEditForm, setShowOrderEditForm] = useState(false);
+
+  const [loading, setLoading] = useState(true);
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -43,7 +44,7 @@ export default function OrderPage() {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `pedido_${order.id}.pdf`;
+      link.download = `orçamento_${order.id}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -67,14 +68,22 @@ export default function OrderPage() {
   useEffect(() => {
     if (!order) return;
     (async () => {
-      const res = await fetch(`${API}/v1/orders/${orderId}/order_items`, { credentials: 'include' });
-      if (!res.ok) return;
-      const { order_items } = await res.json();
-      setItems(order_items);
+      try {
+        setLoading(true);
+        const res = await fetch(`${API}/v1/orders/${orderId}/order_items`, { credentials: 'include' });
+        if (!res.ok) throw new Error('Itens do orçamento não encontrados');
+        const { order_items } = await res.json();
+        setItems(order_items);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [order, orderId]);
 
-  if (!order) return <p>Carregando pedido…</p>;
+  if (loading) return <p className={styles.loading}>Carregando orçamento…</p>;
+  if (!order) return <p className={styles.titleError}>Orçamento não encontrado.</p>;
 
   const handleOrderChange = (e) => {
     const { name, value } = e.target;
@@ -97,7 +106,7 @@ export default function OrderPage() {
   };
 
   const handleOrderDelete = async () => {
-    if (!confirm('Confirma exclusão deste pedido?')) return;
+    if (!confirm('Confirma exclusão deste orçamento?')) return;
     await fetch(`${API}/v1/orders/${orderId}`, { method: 'DELETE', credentials: 'include' });
     router.push(`/dashboard/companies/${companyId}`);
   };
@@ -126,7 +135,7 @@ export default function OrderPage() {
       }
       const { order_item: newItem } = await res.json();
       setItems(prev => [...prev, newItem]);
-      setItemForm({ code: '', product: '', price: '', quantity: '', total: '', ean_code: '', order_id: '' });
+      setItemForm({ code: '', product: '', price: '', quantity: '', total: '', ean_code: '' });
       setItemErrors({});
       setShowItemForm(false);
     } catch (err) {
@@ -179,7 +188,7 @@ export default function OrderPage() {
   return (
     <div className={styles.container}>
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Itens do Pedido</h2>
+        <h2 className={styles.sectionTitle}>Itens do Orçamento {orderId}</h2>
         <div className="table-responsive">
           <table className={styles.table}>
             <thead>
@@ -188,10 +197,9 @@ export default function OrderPage() {
                 <th>Código</th>
                 <th>Produto</th>
                 <th>Preço</th>
-                <th>Quantidade</th>
+                <th>Quant.</th>
                 <th>Total</th>
                 <th>EAN</th>
-                <th>Order ID</th>
               </tr>
             </thead>
             <tbody>
@@ -206,7 +214,7 @@ export default function OrderPage() {
                   )}>
                     <td>{it.id}</td><td>{it.code}</td><td>{it.product}</td>
                     <td>{it.price}</td><td>{it.quantity}</td><td>{it.total}</td>
-                    <td>{it.ean_code}</td><td>{it.order_id}</td>
+                    <td>{it.ean_code}</td>
                   </tr>
                 ))
               )}
@@ -218,7 +226,7 @@ export default function OrderPage() {
             {showItemForm ? 'Cancelar' : 'Adicionar Item'}
           </Button>
           <Button onClick={() => setShowImportForm(f => !f)}>
-            {showImportForm ? 'Cancelar Import' : 'Importar Itens'}
+            {showImportForm ? 'Cancelar Import' : 'Importar tabela com Itens'}
           </Button>
         </div>
 
@@ -260,22 +268,22 @@ export default function OrderPage() {
         )}
       </section>
 
-      <div className={styles.buttons}>
+      <div className={styles.buttonEdit}>
         <Button onClick={() => setShowOrderEditForm(s => !s)}>
-          {showOrderEditForm ? 'Cancelar Edição' : `Editar Pedido #${order.id}`}
+          {showOrderEditForm ? 'Cancelar Edição' : `Editar Orçamento: ${order.id}`}
         </Button>
-        <Button onClick={handleDownloadPdf}>Baixar PDF</Button>
+        <Button onClick={handleDownloadPdf}>Baixar PDF do Orçamento {order.id} com todos os itens</Button>
       </div>
 
       {showOrderEditForm && (
         <>
-          <h1 className={styles.title}>Editar Pedido #{order.id}</h1>
+          <p className={styles.title}>Editar Orçamento: {order.id}</p>
           <form className={styles.form} onSubmit={handleOrderUpdate} noValidate>
             <Input label="Status" name="status" value={orderForm.status} onChange={handleOrderChange} />
             <Input label="Feedback do Admin" name="admin_feedback" value={orderForm.admin_feedback} onChange={handleOrderChange} />
             <div className={styles.buttons}>
-              <Button type="submit">Salvar Pedido</Button>
-              <Button type="button" onClick={handleOrderDelete}>Excluir Pedido</Button>
+              <Button type="submit">Salvar Orçamento</Button>
+              <Button type="button" onClick={handleOrderDelete}>Excluir Orçamento</Button>
             </div>
           </form>
         </>

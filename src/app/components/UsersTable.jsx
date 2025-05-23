@@ -19,7 +19,7 @@ export default function UsersTable({ users }) {
           <th>Nome</th>
           <th>CPF</th>
           <th>Telefone</th>
-          <th>Role</th>
+          <th>Função</th>
         </tr>
       </thead>
       <tbody>

@@ -96,7 +96,7 @@ export default function UserForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.userForm} noValidate>
+    <form onSubmit={handleSubmit} className={styles.form} noValidate>
       <Input
         label="Email"
         name="email"

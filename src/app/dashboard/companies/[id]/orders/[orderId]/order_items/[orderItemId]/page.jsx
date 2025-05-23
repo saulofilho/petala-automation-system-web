@@ -50,8 +50,8 @@ export default function OrderItemPage() {
     })();
   }, [user, orderItemId]);
 
-  if (loading) return <p>Carregando item…</p>;
-  if (!item) return <p>Item não encontrado.</p>;
+  if (loading) return <p className={styles.loading}>Carregando item…</p>;
+  if (!item) return <p className={styles.titleError}>Item não encontrado.</p>;
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -67,8 +67,6 @@ export default function OrderItemPage() {
     const price = parseFloat(form.price);
     if (form.price === '' || isNaN(price)) {
       errs.price = 'Preço é obrigatório e deve ser numérico';
-    } else if (price < 10 || price > 100) {
-      errs.price = 'Preço deve estar entre 10.00 e 100.00';
     }
     return errs;
   };
@@ -118,7 +116,11 @@ export default function OrderItemPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Editar Item #{item.id}</h1>
+      <p className={styles.title}>
+        Editar Item {item.id}. 
+        <br />
+        Nome: {item.product}
+      </p>
       <form onSubmit={handleUpdate} className={styles.form} noValidate>
         <Input label="Código" name="code" value={form.code} onChange={handleChange} />
         {errors.code && <p className={styles.error}>{errors.code}</p>}

@@ -25,7 +25,6 @@ export default function Header() {
     return () => clearInterval(timer);
   }, []);
 
-  // formatação de data e hora
   const dateString = now.toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
@@ -38,7 +37,6 @@ export default function Header() {
     second: '2-digit'
   });
 
-  // saudação conforme o horário
   const hour = now.getHours();
   const greeting = hour < 12
     ? 'Bom dia'
@@ -55,7 +53,7 @@ export default function Header() {
             className={styles.buttonHome}
             onClick={() => router.push('/dashboard')}
           >
-            Home
+            Dashboard
           </button>
         )}
         {showGreeting && (

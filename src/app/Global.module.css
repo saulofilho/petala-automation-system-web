@@ -1,5 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap');
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3em 6em;
+  width: 100%;
+}
+
+.header h1 {
+  font-family: "DM Serif Text", serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 40px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #8E7DBE;
+}
+
 .dateTime {
   font-size: 1rem;
   color: #666;
@@ -18,22 +52,27 @@
   display: flex;
   justify-content: flex-start;
   margin-top: 3rem;
-  /* background: #F7CFD8; */
   background: #F4F8D3;
-  /* background: #A6D6D6;
+  font-size: 16px;
+  /* background: #F7CFD8;
+  background: #A6D6D6;
   background: #8E7DBE; */
 }
+
 .button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
+
 .button:not(:disabled):hover {
   background-color: #A6D6D6;
 }
+
 .button:hover {
   background-position: right center;
   transform: translateY(-3px);
 }
+
 .buttonHome {
   display: block;
   margin: 0 auto;
@@ -42,9 +81,38 @@
   border: none;
   cursor: pointer;
   background: none;
+  font-size: 16px;
 }
+
 .buttonHome:hover {
   font-weight: bolder;
+}
+
+.buttonEdit button {
+  background: transparent;
+  font-weight: bolder;
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+}
+
+.buttonBack {
+  padding: 10px;
+  transition: .2s all ease-in-out;
+  outline: none;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: flex-start;
+  background: transparent;
+  font-size: 16px;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .table {
@@ -73,41 +141,11 @@
   margin-top: 1rem;
   padding: 1rem;
   border: 1px solid lightgray;
-  background: white;
+  background: whitesmoke;
 }
 
 .form > *:not(:last-child) {
   margin-bottom: 0.75rem;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 3em 6em;
-  width: 100%;
-  font-family: "DM Serif Text", serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.headerLeft {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.headerRight {
-  display: flex;
-  align-items: center;
-}
-
-.iconButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  color: #8E7DBE;
 }
 
 .wrapper {
@@ -169,6 +207,15 @@
   color: white;
 }
 
+.dashboard .title {
+  font-size: 16px;
+  margin: 0 0 30px 0;
+}
+
+.dashboard .titleAdmin {
+  font-size: 16px;
+  margin: 120px 0 30px 0;
+}
 
 .error {
   color: #c00;
@@ -176,15 +223,6 @@
   font-size: .9rem;
 }
 
-.userForm {
-  margin-top: 1rem;
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  display: grid;
-  gap: 1rem;
-}
 .field {
   display: flex;
   flex-direction: column;
@@ -212,15 +250,11 @@
   padding: 3em 6em;
 }
 
-.title {
-  font-size: 1rem;
-  margin-bottom: 3rem;
-  color: gray;
-}
-
 .loading {
   padding: 2rem;
-  font-size: 1rem;
+  font-size: 18px;
+  color: #8E7DBE;
+  text-align: center;
 }
 
 .section {
@@ -231,10 +265,18 @@
 }
 
 .sectionTitle {
-  font-size: 1rem;
-  margin-bottom: 2rem;
+  font-size: 20px;
+  margin-bottom: 50px;
   font-weight: 400;
-  color: gray;
+  color: #8E7DBE;
+}
+
+.titleError {
+  font-size: 24px;
+  font-weight: bolder;
+  color: lightcoral;
+  text-align: center;
+  padding: 200px 0;
 }
 
 .addButton {
@@ -301,17 +343,20 @@
     font-size: 12pt;
   }
 
-  .userForm {
-    width: 100%;
-    max-width: none;
-  }
-
   .table {
     min-width: 100%;
   }
 
   .loginForm .form {
     width: 100%;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .dateTime {
+    font-size: 14px;
   }
 }
 

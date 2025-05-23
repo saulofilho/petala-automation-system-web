@@ -39,6 +39,7 @@ export default function UserEditPage() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   const [form, setForm] = useState({
     email: '',
@@ -48,9 +49,8 @@ export default function UserEditPage() {
     role: 'admin',
   });
   const [errors, setErrors] = useState({});
-  const isEdit = true; // estamos na tela de edição
+  const isEdit = true;
 
-  // 1) Busca dados do usuário
   useEffect(() => {
     fetch(`${API_URL}/v1/users/${id}`, { credentials: 'include' })
       .then(res => {
@@ -69,7 +69,6 @@ export default function UserEditPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // 2) Preenche o form quando userData estiver disponível
   useEffect(() => {
     if (userData) {
       setForm({
@@ -109,7 +108,6 @@ export default function UserEditPage() {
     return errs;
   };
 
-  // 3) Submissão do form
   const handleSubmit = async e => {
     e.preventDefault();
     const validationErrors = validate();
@@ -117,7 +115,6 @@ export default function UserEditPage() {
       setErrors(validationErrors);
       return;
     }
-    // constrói payload sem senha
     const payload = { ...form };
     try {
       const res = await fetch(`${API_URL}/v1/users/${id}`, {
@@ -129,8 +126,7 @@ export default function UserEditPage() {
       if (!res.ok) throw new Error('Erro ao atualizar usuário');
       router.push('/dashboard');
     } catch (err) {
-      console.error(err);
-      // opcional: exibir toast ou mensagem de erro global
+      setApiError('Erro ao atualizar usuário');
     }
   };
 
@@ -144,7 +140,7 @@ export default function UserEditPage() {
       if (!res.ok) throw new Error('Erro ao excluir usuário');
       router.push('/dashboard');
     } catch (err) {
-      console.error(err);
+      setApiError('Erro ao excluir usuário');
     }
   };
 
@@ -156,8 +152,11 @@ export default function UserEditPage() {
   }
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Editar usuário: {form.name}</h1>
+    <div className={`${styles.container} ${styles.editUser}`}>
+      <p className={styles.title}>Editar usuário: {form.name}</p>
+
+      {apiError && <p className={styles.error}>{apiError}</p>}
+
       <form onSubmit={handleSubmit} className={styles.userForm} noValidate>
         <Input
           label="Email"

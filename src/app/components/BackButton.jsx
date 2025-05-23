@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 import styles from '../Global.module.css';
 
 export default function BackButton() {
@@ -14,9 +15,9 @@ export default function BackButton() {
   return (
     <button
       onClick={() => router.back()}
-      className={styles.button}
+      className={styles.buttonBack}
     >
-      ← Voltar
+      <ArrowLeft className="mr-2" />
     </button>
   );
 }

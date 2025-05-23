@@ -20,19 +20,16 @@ export default function CompanyPage() {
   const { id: companyId } = useParams();
   const { user, logout } = useAuth();
 
-  // estados gerais
   const [form, setForm] = useState({ name:'', cnpj:'', cep:'', street:'', number:'', city:'', state:'' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  // orders
   const [orders, setOrders] = useState([]);
   const [showOrderForm, setShowOrderForm] = useState(false);
-  const [orderForm, setOrderForm] = useState({ description: '', status:'pending', admin_feedback:'' });
+  const [orderForm, setOrderForm] = useState({ description: '', status:'pending', admin_feedback:'', company_id: '' });
   const [orderErrors, setOrderErrors] = useState({});
 
-  // novo estado para mostrar/ocultar o form de empresa
   const [showCompanyForm, setShowCompanyForm] = useState(false);
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -62,7 +59,6 @@ export default function CompanyPage() {
     })();
   }, [user, companyId]);
 
-  // fetch pedidos
   useEffect(()=>{
     if(loading || notFound) return;
     (async ()=>{
@@ -77,7 +73,6 @@ export default function CompanyPage() {
     })();
   }, [loading, notFound]);
 
-  // validações da empresa
   const validateCompany = () => {
     const e = {};
     if(!form.name.trim()) e.name = 'Nome é obrigatório';
@@ -90,7 +85,6 @@ export default function CompanyPage() {
     return e;
   };
 
-  // handlers de form
   const handleChange = e => {
     let v = e.target.value;
     if(e.target.name === 'cnpj') v = maskCNPJ(v);
@@ -120,7 +114,6 @@ export default function CompanyPage() {
     router.push('/dashboard');
   };
 
-  // validações pedido
   const validateOrder = () => {
     const e = {};
     if(!orderForm.status.trim()) e.status = 'Status é obrigatório';
@@ -145,31 +138,31 @@ export default function CompanyPage() {
     const { order } = await res.json();
     setOrders(o => [...o, order]);
     setShowOrderForm(false);
-    setOrderForm({ description:'', status:'pending', admin_feedback:'' });
+    setOrderForm({ description:'', status:'pending', admin_feedback:'', company_id:'' });
   };
 
-  if(loading) return <p>Carregando empresa…</p>;
-  if(notFound) return <p>Empresa não encontrada.</p>;
+  if(loading) return <p className={styles.loading}>Carregando empresa…</p>;
+  if(notFound) return <p className={styles.titleError}>Empresa não encontrada.</p>;
 
   return (
     <div className={styles.container}>
-      {/* Seção de Orders */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Orders</h2>
+        <h2 className={styles.sectionTitle}>Orçamentos da empresa: {form.name}</h2>
         <table className={styles.table}>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Description</th>
+              <th>Descrição</th>
               <th>Status</th>
               <th>Feedback</th>
+              <th>Company</th>
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 ? (
               <tr key="no-orders">
                 <td colSpan={4} className={styles.noData}>
-                  Nenhum pedido.
+                  Nenhum Orçamento.
                 </td>
               </tr>
             ) : (
@@ -183,6 +176,7 @@ export default function CompanyPage() {
                   <td>{o.description}</td>
                   <td>{o.status}</td>
                   <td>{o.admin_feedback || '-'}</td>
+                  <td>{o.company_id}</td>
                 </tr>
               ))
             )}
@@ -190,32 +184,30 @@ export default function CompanyPage() {
         </table>
 
         <Button onClick={() => setShowOrderForm(s => !s)}>
-          {showOrderForm ? 'Cancelar Pedido' : 'Adicionar Order'}
+          {showOrderForm ? 'Cancelar Orçamento' : 'Adicionar Orçamento'}
         </Button>
 
         {showOrderForm && (
           <form className={styles.form} onSubmit={handleOrderCreate} noValidate>
-            <Input label="Description" name="description" value={orderForm.description} onChange={handleOrderChange}/>
+            <Input label="Descrição do orçamento" name="description" value={orderForm.description} onChange={handleOrderChange}/>
             {orderErrors.description && <p className={styles.error}>{orderErrors.description}</p>}
             <Input label="Status" name="status" value={orderForm.status} onChange={handleOrderChange}/>
             {orderErrors.status && <p className={styles.error}>{orderErrors.status}</p>}
             <Input label="Feedback" name="admin_feedback" value={orderForm.admin_feedback} onChange={handleOrderChange}/>
-            <Button type="submit">Salvar Order</Button>
+            <Button type="submit">Salvar Orçamento</Button>
           </form>
         )}
       </section>
 
-      {/* Botão para mostrar/ocultar form de empresa */}
-      <div className={styles.buttons}>
+      <div className={styles.buttonEdit}>
         <Button onClick={() => setShowCompanyForm(s => !s)}>
           {showCompanyForm ? 'Cancelar Edição' : 'Editar Empresa'}
         </Button>
       </div>
 
-      {/* Form de edição da empresa (condicional) */}
       {showCompanyForm && (
         <>
-          <h1 className={styles.title}>Editar Empresa</h1>
+          <p className={styles.title}>Editar Empresa: {form.name}</p>
           <form className={styles.form} onSubmit={handleUpdate} noValidate>
             <Input label="Nome" name="name" value={form.name} onChange={handleChange}/>
             {errors.name && <p className={styles.error}>{errors.name}</p>}

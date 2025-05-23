@@ -88,12 +88,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${styles.dashboard}`}>
       <p className={styles.title}>
-        Este é o seu dashboard, onde você acompanha indicadores-chave como número de empresas cadastradas, orçamentos pendentes e status de abastecimento, além de gerenciar empresas e seus históricos, criar, enviar e monitorar orçamentos, manter o catálogo de produtos e registrar e visualizar abastecimentos.
-        <br/>
-        <br/>
-        Para administradores, também é possível controlar usuários e permissões.
+        Este é o seu dashboard, onde você acompanha as empresas cadastradas, além de gerenciar empresas e seus históricos, criar, enviar e monitorar orçamentos.
+        <br />
+        Clique na empresa para adicionar editar ou adicionar um orçamento.
       </p>
 
       <section className={styles.section}>
@@ -112,20 +111,27 @@ export default function DashboardPage() {
       </section>
 
       {user.role === 'admin' && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Usuários cadastrados no sistema</h2>
+        <>
+          <p className={`${styles.title} ${styles.titleAdmin}`}>
+            Para administradores, também é possível controlar usuários e permissões.
+            <br />
+            Clique no usuário para editar.
+          </p>
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Usuários cadastrados no sistema</h2>
 
-          <UsersTable users={users} />
+            <UsersTable users={users} />
 
-          <button
-            className={styles.button}
-            onClick={() => setShowUserForm(prev => !prev)}
-          >
-            {showUserForm ? 'Cancelar' : 'Adicionar Usuário'}
-          </button>
+            <button
+              className={styles.button}
+              onClick={() => setShowUserForm(prev => !prev)}
+            >
+              {showUserForm ? 'Cancelar' : 'Adicionar Usuário'}
+            </button>
 
-          {showUserForm && <UserForm onCreate={handleCreateUser} />}
-        </section>
+            {showUserForm && <UserForm onCreate={handleCreateUser} />}
+          </section>
+        </>
       )}
     </div>
   );

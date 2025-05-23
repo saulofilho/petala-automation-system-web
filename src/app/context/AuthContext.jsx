@@ -2,6 +2,7 @@
 
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import styles from '../Global.module.css';
 
 const AuthContext = createContext();
 
@@ -60,7 +61,7 @@ export function AuthProvider({ children }) {
   };
 
   if (user === undefined) {
-    return <p>Carregando usuário…</p>;
+    return <p className={styles.loading}>Carregando usuário…</p>;
   }
 
   return (
