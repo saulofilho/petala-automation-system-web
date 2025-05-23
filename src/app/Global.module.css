@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap');
+
 .dateTime {
   font-size: 1rem;
   color: #666;
@@ -45,7 +47,6 @@
   font-weight: bolder;
 }
 
-/* 2) Tabelas */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -68,13 +69,13 @@
   background-color: rgba(0, 112, 243, 0.05);
 }
 
-/* 3) Formulários genéricos */
 .form {
   margin-top: 1rem;
   padding: 1rem;
   border: 1px solid lightgray;
   background: white;
 }
+
 .form > *:not(:last-child) {
   margin-bottom: 0.75rem;
 }
@@ -86,22 +87,21 @@
   padding: 3em 6em;
   width: 100%;
   font-family: "DM Serif Text", serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
-/* Agrupa botão Home + saudação */
 .headerLeft {
   display: flex;
   align-items: center;
-  gap: 1rem; /* espaçamento entre Home e título */
+  gap: 1rem;
 }
 
-/* Container do ícone de perfil à direita */
 .headerRight {
   display: flex;
   align-items: center;
 }
 
-/* botão do ícone */
 .iconButton {
   background: none;
   border: none;
@@ -110,7 +110,6 @@
   color: #8E7DBE;
 }
 
-/* 6) Inputs e wrappers */
 .wrapper {
   margin-bottom: 1rem;
   width: 100%;
@@ -136,18 +135,47 @@
   border-bottom: 2px solid #8E7DBE;
 }
 
-/* 7) LoginForm */
 .loginForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1rem;
   width: 100%;
-  max-width: 360px;
 }
+
+.loginForm .title {
+  font-family: "DM Serif Text", serif;
+  font-weight: bolder;
+  font-style: normal;
+  font-size: 48px;
+  color: #8E7DBE;
+  text-align: center;
+}
+
+.loginForm p {
+  text-align: center;
+  font-size: 18px;
+}
+
+.loginForm .form {
+  width: 50%;
+}
+
+.loginForm button {
+  font-size: 18px;
+  background: #8E7DBE;
+  color: white;
+}
+
+
 .error {
   color: #c00;
   margin-bottom: 1rem;
   font-size: .9rem;
 }
 
-/* 8) UserForm */
 .userForm {
   margin-top: 1rem;
   background: #fff;
@@ -230,10 +258,11 @@
   width: 100%;
   font-size: 14px;
   padding: 3em 6em;
+  text-align: center;
+  height: 100%;
 }
 
 @media (max-width: 768px) {
-  /* Header: empilha conteúdo e reduz padding */
   .header {
     flex-direction: column;
     align-items: flex-start;
@@ -246,45 +275,47 @@
     margin-bottom: 1rem;
   }
 
-  /* Container geral */
   .container {
     padding: 2em 1em;
   }
 
-  /* Seções e formulários ficam com padding reduzido e margem menor */
   .section,
   .form {
     padding: 1rem;
     margin-bottom: 1rem;
   }
 
-  /* Botões ocupam 100% de largura e centralizam texto */
   .button,
   .addButton {
     width: 100%;
     justify-content: center;
   }
 
-  /* Tabelas ganham scroll horizontal */
   .table {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Inputs e formulários */
   .input {
     font-size: 12pt;
   }
-  .userForm,
-  .loginForm {
+
+  .userForm {
     width: 100%;
     max-width: none;
+  }
+
+  .table {
+    min-width: 100%;
+  }
+
+  .loginForm .form {
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  /* Ajustes adicionais para smartphones */
   .header {
     padding: 1.5em 0.5em;
   }
@@ -301,6 +332,18 @@
   }
   .input {
     padding: 0.75rem;
+  }
+
+  .loginForm .title {
+    font-size: 24px;
+  }
+
+  .loginForm p {
+    font-size: 14px;
+  }
+
+  .loginForm .form {
+    width: 100%;
   }
 }
 
@@ -322,10 +365,4 @@
 .table-responsive::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,0.2);
   border-radius: 3px;
-}
-
-@media (max-width: 768px) {
-  .table {
-    min-width: 100%;
-  }
 }

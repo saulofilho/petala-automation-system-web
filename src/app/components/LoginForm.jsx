@@ -30,9 +30,10 @@ export default function LoginForm() {
   };
 
   return (
-    <section>
+    <section className={styles.loginForm}>
+      <h1 className={styles.title}>Sistema de Automação Pétala Comercial</h1>
       <p>
-        Bem-vindo de volta Entre na sua conta usando e-mail e senha
+        Bem-vindo. Entre na sua conta usando e-mail e senha.
       </p>
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <p className={styles.error}>{error}</p>}
