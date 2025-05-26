@@ -2,6 +2,7 @@
 
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from './ToastContext';
 import styles from '../Global.module.css';
 
 const AuthContext = createContext();
@@ -10,6 +11,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined);
   const router = useRouter();
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetch(`${API}/v1/users/me`, {
@@ -44,11 +46,13 @@ export function AuthProvider({ children }) {
 
     if (!res.ok) {
       const err = await res.text();
+      showToast('Credenciais inválidas', 'error');
       throw new Error(err);
     }
 
     const data = await res.json();
     setUser(data.user);
+    showToast('Login realizado com sucesso', 'success');
     router.push('/dashboard');
   };
 
@@ -58,7 +62,6 @@ export function AuthProvider({ children }) {
       credentials: 'include',
     });
     setUser(null);
-    router.replace('/');
   };
 
   if (user === undefined) {

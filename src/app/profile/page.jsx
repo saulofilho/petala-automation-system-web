@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import styles from '../Global.module.css';
@@ -34,6 +35,7 @@ function maskPhone(value) {
 export default function ProfilePage() {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { showToast } = useToast();
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   const [form, setForm] = useState({
@@ -63,9 +65,9 @@ export default function ProfilePage() {
           role: u.role || user.role,
         });
       })
-      .catch(console.error)
+      .catch(() => showToast('Erro ao carregar perfil', 'error'))
       .finally(() => setLoading(false));
-  }, [user, router]);
+  }, [user, router, API_URL, showToast]);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -100,12 +102,16 @@ export default function ProfilePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user: form }),
       });
-      if (!res.ok) throw new Error('Erro ao atualizar perfil');
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || 'Erro ao atualizar perfil');
+      }
+
       await res.json();
-      alert('Perfil atualizado com sucesso');
+      showToast('Perfil atualizado com sucesso', 'success');
     } catch (err) {
-      console.error(err);
-      alert('Falha ao atualizar perfil');
+      showToast(err.message || 'Falha ao atualizar perfil', 'error');
     }
   };
 
@@ -119,9 +125,8 @@ export default function ProfilePage() {
       if (!res.ok) throw new Error('Erro ao excluir conta');
       logout();
       router.push('/');
-    } catch (err) {
-      console.error(err);
-      alert('Falha ao excluir conta');
+    } catch {
+      showToast('Falha ao excluir conta', 'error');
     }
   };
 
@@ -129,8 +134,8 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.sectionTitlePages}>Editar o meu Perfil</h1>
-      <form onSubmit={handleSubmit} className={styles.form} noValidate>
+      <h1 className={styles.title}>Meu Perfil</h1>
+      <form onSubmit={handleSubmit} className={styles.userForm} noValidate>
         <Input
           label="Email"
           name="email"
@@ -182,11 +187,11 @@ export default function ProfilePage() {
           <option value="manager">Manager</option>
         </Input>
 
-        <Button type="submit">Salvar Alterações</Button>
         <div>
           <Button variant="destructive" type="button" onClick={handleDelete}>
             Excluir Conta
           </Button>
+          <Button type="submit">Salvar Alterações</Button>
         </div>
       </form>
     </div>
