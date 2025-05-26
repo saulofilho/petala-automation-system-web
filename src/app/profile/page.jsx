@@ -103,12 +103,12 @@ export default function ProfilePage() {
         body: JSON.stringify({ user: form }),
       });
 
+      const body = await res.text();
+
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || 'Erro ao atualizar perfil');
+        throw new Error(body || 'Erro ao atualizar perfil');
       }
 
-      await res.json();
       showToast('Perfil atualizado com sucesso', 'success');
     } catch (err) {
       showToast(err.message || 'Falha ao atualizar perfil', 'error');

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import CompaniesTable from '../components/CompaniesTable';
 import CompanyForm from '../components/CompanyForm';
 import UserForm from '../components/UserForm';
@@ -10,6 +11,7 @@ import styles from '../Global.module.css';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [companies, setCompanies] = useState([]);
   const [showCompanyForm, setShowCompanyForm] = useState(false);
   const [showUserForm, setShowUserForm] = useState(false);
@@ -23,11 +25,11 @@ export default function DashboardPage() {
       credentials: 'include',
     })
       .then(res => {
-        if (!res.ok) throw new Error('Erro ao carregar empresas');
+        if (!res.ok) throw new Error();
         return res.json();
       })
       .then(data => setCompanies(data.companies || data))
-      .catch(console.error);
+      .catch(() => showToast('Erro ao carregar empresas', 'error'));
   }, [user]);
 
   useEffect(() => {
@@ -37,51 +39,56 @@ export default function DashboardPage() {
       credentials: 'include',
     })
       .then(res => {
-        if (!res.ok) throw new Error('Erro ao carregar usuários');
+        if (!res.ok) throw new Error();
         return res.json();
       })
       .then(data => setUsers(data.users || data))
-      .catch(console.error);
+      .catch(() => showToast('Erro ao carregar usuários', 'error'));
   }, [user]);
 
   const handleCreateCompany = async companyData => {
     try {
-      const res = await fetch(
-        `${API_URL}/v1/users/${user.id}/companies`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ company: { ...companyData, user_id: user.id } }),
-        }
-      );
-      if (!res.ok) throw new Error('Erro ao criar empresa');
+      const res = await fetch(`${API_URL}/v1/users/${user.id}/companies`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company: { ...companyData, user_id: user.id } }),
+      });
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || 'Erro ao criar empresa');
+      }
       const data = await res.json();
       const created = data.company || data;
       setCompanies(prev => [...prev, created]);
       setShowCompanyForm(false);
-    } catch (error) {
-      console.error(error);
+      showToast('Empresa criada com sucesso', 'success');
+    } catch {
+      showToast('Erro ao criar empresa', 'error');
     }
   };
 
   const handleCreateUser = async userData => {
-      try {
-        const res = await fetch(`${API_URL}/v1/users`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user: userData }),
-        });
-        if (!res.ok) throw new Error('Erro ao criar usuário');
-        const data = await res.json();
-        const created = data.user || data;
-        setUsers(prev => [...prev, created]);
-        setShowUserForm(false);
-      } catch (error) {
-        console.error(error);
+    try {
+      const res = await fetch(`${API_URL}/v1/users`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user: userData }),
+      });
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || 'Erro ao criar usuário');
       }
-    };
+      const data = await res.json();
+      const created = data.user || data;
+      setUsers(prev => [...prev, created]);
+      setShowUserForm(false);
+      showToast('Usuário criado com sucesso', 'success');
+    } catch {
+      showToast('Erro ao criar usuário', 'error');
+    }
+  };
 
   if (!user) {
     return <p className={styles.loading}>Carregando usuário…</p>;
@@ -106,23 +113,21 @@ export default function DashboardPage() {
       </section>
 
       {user.role === 'admin' && (
-        <>
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Usuários cadastrados</h2>
-            <p className={styles.subtitle}>
-              Para administradores, também é possível gerenciar usuários e permissões.
-              Clique no usuário para editar.
-            </p>
-            <UsersTable users={users} />
-            <button
-              className={styles.button}
-              onClick={() => setShowUserForm(prev => !prev)}
-            >
-              {showUserForm ? 'Cancelar' : 'Adicionar Usuário'}
-            </button>
-            {showUserForm && <UserForm onCreate={handleCreateUser} />}
-          </section>
-        </>
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Usuários cadastrados</h2>
+          <p className={styles.subtitle}>
+            Para administradores, também é possível gerenciar usuários e permissões.
+            Clique no usuário para editar.
+          </p>
+          <UsersTable users={users} />
+          <button
+            className={styles.button}
+            onClick={() => setShowUserForm(prev => !prev)}
+          >
+            {showUserForm ? 'Cancelar' : 'Adicionar Usuário'}
+          </button>
+          {showUserForm && <UserForm onCreate={handleCreateUser} />}
+        </section>
       )}
     </div>
   );

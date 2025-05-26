@@ -3,6 +3,7 @@
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../../../../../../context/AuthContext';
+import { useToast } from '../../../../../../../context/ToastContext';
 import Input from '../../../../../../../components/Input';
 import Button from '../../../../../../../components/Button';
 import styles from '../../../../../../../Global.module.css';
@@ -11,6 +12,7 @@ export default function OrderItemPage() {
   const router = useRouter();
   const { id: companyId, orderId, orderItemId } = useParams();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
   const [item, setItem] = useState(null);
@@ -56,7 +58,7 @@ export default function OrderItemPage() {
           ean_code: order_item.ean_code || ''
         });
       } catch (err) {
-        console.error(err);
+        showToast('Erro ao carregar item', 'error');
       } finally {
         setLoading(false);
       }
@@ -105,7 +107,7 @@ export default function OrderItemPage() {
       return;
     }
     try {
-      await fetch(`${API}/v1/order_items/${orderItemId}`, {
+      const res = await fetch(`${API}/v1/order_items/${orderItemId}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -121,22 +123,26 @@ export default function OrderItemPage() {
           }
         }),
       });
+      if (!res.ok) throw new Error();
+      showToast('Item atualizado com sucesso!', 'success');
       router.push(`/dashboard/companies/${companyId}/orders/${orderId}`);
-    } catch (err) {
-      console.error('Erro ao atualizar item', err);
+    } catch {
+      showToast('Erro ao atualizar item', 'error');
     }
   };
 
   const handleDelete = async () => {
     if (!confirm('Deseja excluir este item?')) return;
     try {
-      await fetch(`${API}/v1/order_items/${orderItemId}`, {
+      const res = await fetch(`${API}/v1/order_items/${orderItemId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
+      if (!res.ok) throw new Error();
+      showToast('Item excluído com sucesso!', 'success');
       router.push(`/dashboard/companies/${companyId}/orders/${orderId}`);
-    } catch (err) {
-      console.error('Erro ao excluir item', err);
+    } catch {
+      showToast('Erro ao excluir item', 'error');
     }
   };
 

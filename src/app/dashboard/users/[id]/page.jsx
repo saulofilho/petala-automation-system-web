@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import styles from '../../../Global.module.css';
+import { useToast } from '../../../context/ToastContext';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CPF_REGEX = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
@@ -33,6 +34,7 @@ function maskPhone(value) {
 export default function UserEditPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { showToast } = useToast();
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   const [userData, setUserData] = useState(null);
@@ -123,9 +125,11 @@ export default function UserEditPage() {
         body: JSON.stringify({ user: payload }),
       });
       if (!res.ok) throw new Error('Erro ao atualizar usuário');
+      showToast('Usuário atualizado com sucesso!');
       router.push('/dashboard');
     } catch (err) {
       setApiError('Erro ao atualizar usuário');
+      showToast('Erro ao atualizar usuário', 'error');
     }
   };
 
@@ -137,9 +141,11 @@ export default function UserEditPage() {
         credentials: 'include',
       });
       if (!res.ok) throw new Error('Erro ao excluir usuário');
+      showToast('Usuário excluído com sucesso!');
       router.push('/dashboard');
     } catch (err) {
       setApiError('Erro ao excluir usuário');
+      showToast('Erro ao excluir usuário', 'error');
     }
   };
 
