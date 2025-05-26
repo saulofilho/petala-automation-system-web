@@ -117,7 +117,7 @@ export default function OrderItemPage() {
   return (
     <div className={styles.container}>
       <p className={styles.title}>
-        Editar Item {item.id}. 
+        Editar Item: {item.id}. 
         <br />
         Nome: {item.product}
       </p>

@@ -9,10 +9,10 @@
 }
 
 .header h1 {
-  font-family: "DM Serif Text", serif;
   font-weight: 400;
   font-style: normal;
-  font-size: 40px;
+  font-size: 32px;
+  color: black;
 }
 
 .headerLeft {
@@ -31,15 +31,14 @@
   border: none;
   cursor: pointer;
   padding: 0.25rem;
-  color: #8E7DBE;
+  color: black;
 }
 
 .dateTime {
   font-size: 1rem;
-  color: #666;
   margin-top: 0.25rem;
   font-family: "Nunito Sans", sans-serif;
-  color: #8E7DBE;
+  color: darkgray;
 }
 
 .button {
@@ -52,8 +51,9 @@
   display: flex;
   justify-content: flex-start;
   margin-top: 3rem;
-  background: #F4F8D3;
+  background: #8E7DBE;
   font-size: 16px;
+  color: white;
   /* background: #F7CFD8;
   background: #A6D6D6;
   background: #8E7DBE; */
@@ -65,7 +65,8 @@
 }
 
 .button:not(:disabled):hover {
-  background-color: #A6D6D6;
+  background: #b6e4ff;
+  color: black;
 }
 
 .button:hover {
@@ -89,11 +90,9 @@
 }
 
 .buttonEdit button {
-  background: transparent;
-  font-weight: bolder;
-  width: 100%;
   text-align: center;
   justify-content: center;
+  margin-bottom: 20px;
 }
 
 .buttonBack {
@@ -141,7 +140,7 @@
   margin-top: 1rem;
   padding: 1rem;
   border: 1px solid lightgray;
-  background: whitesmoke;
+  background: white;
 }
 
 .form > *:not(:last-child) {
@@ -188,17 +187,19 @@
   font-weight: bolder;
   font-style: normal;
   font-size: 48px;
-  color: #8E7DBE;
+  color: darkgray;
   text-align: center;
 }
 
 .loginForm p {
   text-align: center;
   font-size: 18px;
+  color: black;
 }
 
 .loginForm .form {
   width: 50%;
+  background: white;
 }
 
 .loginForm button {
@@ -208,13 +209,13 @@
 }
 
 .dashboard .title {
-  font-size: 16px;
-  margin: 0 0 30px 0;
+  font-size: 14px;
+  margin: 10px 0 50px 0;
 }
 
 .dashboard .titleAdmin {
-  font-size: 16px;
-  margin: 120px 0 30px 0;
+  font-size: 14px;
+  margin: 10px 0 50px 0;
 }
 
 .error {
@@ -265,10 +266,10 @@
 }
 
 .sectionTitle {
-  font-size: 20px;
-  margin-bottom: 50px;
+  font-size: 24px;
   font-weight: 400;
-  color: #8E7DBE;
+  font-family: "DM Serif Text", serif;
+  margin-bottom: 20px;
 }
 
 .titleError {
@@ -303,6 +304,27 @@
   text-align: center;
   height: 100%;
 }
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+}
+
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
 
 @media (max-width: 768px) {
   .header {
@@ -390,24 +412,4 @@
   .loginForm .form {
     width: 100%;
   }
-}
-
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.table {
-  width: 100%;
-  min-width: 600px;
-  border-collapse: collapse;
-}
-
-.table-responsive::-webkit-scrollbar {
-  height: 6px;
-}
-.table-responsive::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
-  border-radius: 3px;
 }

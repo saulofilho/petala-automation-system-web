@@ -89,46 +89,37 @@ export default function DashboardPage() {
 
   return (
     <div className={`${styles.container} ${styles.dashboard}`}>
-      <p className={styles.title}>
-        Este é o seu dashboard, onde você acompanha as empresas cadastradas, além de gerenciar empresas e seus históricos, criar, enviar e monitorar orçamentos.
-        <br />
-        Clique na empresa para adicionar editar ou adicionar um orçamento.
-      </p>
-
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>As suas empresas</h2>
-
+        <p className={styles.title}>
+          Este é o seu dashboard, onde você acompanha as empresas cadastradas, além de gerenciar empresas e seus históricos, criar, enviar e monitorar orçamentos.
+          Clique na empresa para adicionar editar ou adicionar um orçamento.
+        </p>
         <CompaniesTable companies={companies} />
-
         <button
           className={styles.button}
           onClick={() => setShowCompanyForm(prev => !prev)}
         >
           {showCompanyForm ? 'Cancelar' : 'Adicionar Empresa'}
         </button>
-
         {showCompanyForm && <CompanyForm onCreate={handleCreateCompany} />}
       </section>
 
       {user.role === 'admin' && (
         <>
-          <p className={`${styles.title} ${styles.titleAdmin}`}>
-            Para administradores, também é possível controlar usuários e permissões.
-            <br />
-            Clique no usuário para editar.
-          </p>
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Usuários cadastrados no sistema</h2>
-
+            <h2 className={styles.sectionTitle}>Usuários cadastrados</h2>
+            <p className={`${styles.title} ${styles.titleAdmin}`}>
+              Para administradores, também é possível gerenciar usuários e permissões.
+              Clique no usuário para editar.
+            </p>
             <UsersTable users={users} />
-
             <button
               className={styles.button}
               onClick={() => setShowUserForm(prev => !prev)}
             >
               {showUserForm ? 'Cancelar' : 'Adicionar Usuário'}
             </button>
-
             {showUserForm && <UserForm onCreate={handleCreateUser} />}
           </section>
         </>

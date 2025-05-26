@@ -129,8 +129,8 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Meu Perfil</h1>
-      <form onSubmit={handleSubmit} className={styles.userForm} noValidate>
+      <h1 className={styles.sectionTitle}>Editar o meu Perfil</h1>
+      <form onSubmit={handleSubmit} className={styles.form} noValidate>
         <Input
           label="Email"
           name="email"
@@ -182,11 +182,11 @@ export default function ProfilePage() {
           <option value="manager">Manager</option>
         </Input>
 
+        <Button type="submit">Salvar Alterações</Button>
         <div>
           <Button variant="destructive" type="button" onClick={handleDelete}>
             Excluir Conta
           </Button>
-          <Button type="submit">Salvar Alterações</Button>
         </div>
       </form>
     </div>

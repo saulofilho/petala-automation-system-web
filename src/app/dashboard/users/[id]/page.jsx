@@ -1,4 +1,3 @@
-// app/src/app/user/[id]/page.jsx (ou .tsx, conforme sua estrutura)
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -153,11 +152,11 @@ export default function UserEditPage() {
 
   return (
     <div className={`${styles.container} ${styles.editUser}`}>
-      <p className={styles.title}>Editar usuário: {form.name}</p>
+      <p className={styles.title}>Editar usuário: {form.name}.</p>
 
       {apiError && <p className={styles.error}>{apiError}</p>}
 
-      <form onSubmit={handleSubmit} className={styles.userForm} noValidate>
+      <form onSubmit={handleSubmit} className={styles.form} noValidate>
         <Input
           label="Email"
           name="email"

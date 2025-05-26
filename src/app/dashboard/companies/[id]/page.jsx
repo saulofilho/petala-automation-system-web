@@ -147,7 +147,7 @@ export default function CompanyPage() {
   return (
     <div className={styles.container}>
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Orçamentos da empresa: {form.name}</h2>
+        <h2 className={styles.sectionTitle}>Orçamentos da empresa: {form.name}.</h2>
         <table className={styles.table}>
           <thead>
             <tr>
@@ -207,7 +207,7 @@ export default function CompanyPage() {
 
       {showCompanyForm && (
         <>
-          <p className={styles.title}>Editar Empresa: {form.name}</p>
+          <p className={styles.title}>Editar Empresa: {form.name}.</p>
           <form className={styles.form} onSubmit={handleUpdate} noValidate>
             <Input label="Nome" name="name" value={form.name} onChange={handleChange}/>
             {errors.name && <p className={styles.error}>{errors.name}</p>}

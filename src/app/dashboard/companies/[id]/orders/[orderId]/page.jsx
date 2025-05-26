@@ -188,7 +188,7 @@ export default function OrderPage() {
   return (
     <div className={styles.container}>
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Itens do Orçamento {orderId}</h2>
+        <h2 className={styles.sectionTitle}>Itens do Orçamento: {orderId}.</h2>
         <div className="table-responsive">
           <table className={styles.table}>
             <thead>
@@ -223,7 +223,7 @@ export default function OrderPage() {
         </div>
         <div className={styles.buttons}>
           <Button onClick={() => setShowItemForm(f => !f)}>
-            {showItemForm ? 'Cancelar' : 'Adicionar Item'}
+            {showItemForm ? 'Cancelar' : 'Adicionar item manualmente'}
           </Button>
           <Button onClick={() => setShowImportForm(f => !f)}>
             {showImportForm ? 'Cancelar Import' : 'Importar tabela com Itens'}
