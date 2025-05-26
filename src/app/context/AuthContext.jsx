@@ -58,6 +58,7 @@ export function AuthProvider({ children }) {
       credentials: 'include',
     });
     setUser(null);
+    router.replace('/');
   };
 
   if (user === undefined) {

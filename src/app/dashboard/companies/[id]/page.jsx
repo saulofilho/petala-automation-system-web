@@ -19,18 +19,20 @@ export default function CompanyPage() {
   const router = useRouter();
   const { id: companyId } = useParams();
   const { user, logout } = useAuth();
-
   const [form, setForm] = useState({ name:'', cnpj:'', cep:'', street:'', number:'', city:'', state:'' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-
   const [orders, setOrders] = useState([]);
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [orderForm, setOrderForm] = useState({ description: '', status:'pending', admin_feedback:'', company_id: '' });
   const [orderErrors, setOrderErrors] = useState({});
-
   const [showCompanyForm, setShowCompanyForm] = useState(false);
+  const STATUS_LABELS = {
+    pending: 'Pendente',
+    approved: 'Aprovado',
+    denied: 'Negado'
+  };
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -147,7 +149,7 @@ export default function CompanyPage() {
   return (
     <div className={styles.container}>
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Orçamentos da empresa: {form.name}.</h2>
+        <h2 className={styles.sectionTitlePages}>Orçamentos da empresa: {form.name}.</h2>
         <table className={styles.table}>
           <thead>
             <tr>
@@ -174,7 +176,11 @@ export default function CompanyPage() {
                 >
                   <td>{o.id}</td>
                   <td>{o.description}</td>
-                  <td>{o.status}</td>
+                  <td>
+                    <span className={`${styles.statusTag} ${styles[o.status]}`}>
+                      {STATUS_LABELS[o.status] || o.status}
+                    </span>
+                  </td>
                   <td>{o.admin_feedback || '-'}</td>
                   <td>{o.company_id}</td>
                 </tr>
@@ -191,7 +197,19 @@ export default function CompanyPage() {
           <form className={styles.form} onSubmit={handleOrderCreate} noValidate>
             <Input label="Descrição do orçamento" name="description" value={orderForm.description} onChange={handleOrderChange}/>
             {orderErrors.description && <p className={styles.error}>{orderErrors.description}</p>}
-            <Input label="Status" name="status" value={orderForm.status} onChange={handleOrderChange}/>
+            <label className={styles.label}>
+              Status
+              <select
+                name="status"
+                value={orderForm.status}
+                onChange={handleOrderChange}
+                className={styles.input}
+              >
+                <option value="pending">Pendente</option>
+                <option value="approved">Aprovado</option>
+                <option value="denied">Negado</option>
+              </select>
+            </label>
             {orderErrors.status && <p className={styles.error}>{orderErrors.status}</p>}
             <Input label="Feedback" name="admin_feedback" value={orderForm.admin_feedback} onChange={handleOrderChange}/>
             <Button type="submit">Salvar Orçamento</Button>

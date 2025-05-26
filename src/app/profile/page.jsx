@@ -129,7 +129,7 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.sectionTitle}>Editar o meu Perfil</h1>
+      <h1 className={styles.sectionTitlePages}>Editar o meu Perfil</h1>
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
         <Input
           label="Email"

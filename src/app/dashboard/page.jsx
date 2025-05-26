@@ -91,7 +91,7 @@ export default function DashboardPage() {
     <div className={`${styles.container} ${styles.dashboard}`}>
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>As suas empresas</h2>
-        <p className={styles.title}>
+        <p className={styles.subtitle}>
           Este é o seu dashboard, onde você acompanha as empresas cadastradas, além de gerenciar empresas e seus históricos, criar, enviar e monitorar orçamentos.
           Clique na empresa para adicionar editar ou adicionar um orçamento.
         </p>
@@ -109,7 +109,7 @@ export default function DashboardPage() {
         <>
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Usuários cadastrados</h2>
-            <p className={`${styles.title} ${styles.titleAdmin}`}>
+            <p className={styles.subtitle}>
               Para administradores, também é possível gerenciar usuários e permissões.
               Clique no usuário para editar.
             </p>

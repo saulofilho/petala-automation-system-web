@@ -9,6 +9,8 @@ export default function Input({
   name,
   value,
   onChange,
+  readOnly = false,
+  disabled = false,
   children
 }) {
   return (
@@ -24,18 +26,21 @@ export default function Input({
           value={value}
           onChange={onChange}
           className={styles.input}
+          disabled={disabled}
+          readOnly={readOnly}
         >
           {children}
         </select>
       ) : (
         <input
-          as={Tag}
           id={name}
           name={name}
           type={type}
           value={value}
           onChange={onChange}
           className={styles.input}
+          readOnly={readOnly}
+          disabled={disabled}
         />
       )}
     </div>

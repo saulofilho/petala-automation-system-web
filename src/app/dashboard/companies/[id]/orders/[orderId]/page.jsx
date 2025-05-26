@@ -35,6 +35,17 @@ export default function OrderPage() {
 
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+  const formatToBRL = (value) => {
+    let num = value.replace(/\D/g, '');
+    if (num.length === 0) return '';
+    num = (parseInt(num, 10) / 100).toFixed(2);
+    return num.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  const parseFromBRL = (value) => {
+    return value.replace(/\./g, '').replace(',', '.');
+  };
+
   const handleDownloadPdf = async () => {
     if (!order) return;
     try {
@@ -113,19 +124,41 @@ export default function OrderPage() {
 
   const handleItemChange = (e) => {
     const { name, value } = e.target;
-    setItemForm(f => ({ ...f, [name]: value }));
+
+    setItemForm(prev => {
+      const updated = { ...prev, [name]: value };
+
+      const rawPrice = parseFloat(parseFromBRL(updated.price || '0'));
+      const rawQuantity = parseInt(updated.quantity || '0', 10);
+
+      if (!isNaN(rawPrice) && !isNaN(rawQuantity)) {
+        const newTotal = (rawPrice * rawQuantity).toFixed(2);
+        updated.total = newTotal;
+      }
+
+      if (name === 'price') {
+        updated.price = formatToBRL(value);
+      }
+
+      return updated;
+    });
   };
 
   const handleItemSave = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...itemForm,
+        price: parseFromBRL(itemForm.price),
+        order_id: orderId
+      };
       const res = await fetch(
         `${API}/v1/orders/${orderId}/order_items`,
         {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order_item: { ...itemForm, order_id: orderId } }),
+          body: JSON.stringify({ order_item: payload }),
         }
       );
       if (!res.ok) {
@@ -188,7 +221,7 @@ export default function OrderPage() {
   return (
     <div className={styles.container}>
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Itens do Orçamento: {orderId}.</h2>
+        <h2 className={styles.sectionTitlePages}>Itens do Orçamento: {orderId}.</h2>
         <div className="table-responsive">
           <table className={styles.table}>
             <thead>
@@ -226,7 +259,7 @@ export default function OrderPage() {
             {showItemForm ? 'Cancelar' : 'Adicionar item manualmente'}
           </Button>
           <Button onClick={() => setShowImportForm(f => !f)}>
-            {showImportForm ? 'Cancelar Import' : 'Importar tabela com Itens'}
+            {showImportForm ? 'Cancelar Import' : 'Importar tabela xlsx com vários itens'}
           </Button>
         </div>
 
@@ -234,9 +267,10 @@ export default function OrderPage() {
           <form className={styles.form} onSubmit={handleItemSave} noValidate>
             <Input label="Código" name="code" value={itemForm.code} onChange={handleItemChange} />
             <Input label="Produto" name="product" value={itemForm.product} onChange={handleItemChange} />
-            <Input label="Preço" name="price" type="number" value={itemForm.price} onChange={handleItemChange} />
+            <Input label="Preço" name="price" value={itemForm.price} onChange={handleItemChange} />
             <Input label="Quantidade" name="quantity" type="number" value={itemForm.quantity} onChange={handleItemChange} />
-            <Input label="Total" name="total" type="number" value={itemForm.total} onChange={handleItemChange} /> {/* Novo campo */}
+            {/* <Input label="Total" name="total" type="number" value={itemForm.total} onChange={handleItemChange} /> */}
+            <p>Total: R$ {formatToBRL(itemForm.total.toString())}</p>
             <Input label="EAN" name="ean_code" value={itemForm.ean_code} onChange={handleItemChange} />
 
             {Object.keys(itemErrors).length > 0 && (

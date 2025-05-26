@@ -30,7 +30,11 @@ export default function LoginForm() {
 
   return (
     <section className={styles.loginForm}>
-      <h1 className={styles.title}>Sistema de Automação Pétala Comercial</h1>
+      <h1 className={styles.title}>
+        Sistema de Automação 
+        <br />
+        Pétala Comercia
+      </h1>
       <p>
         Bem-vindo. Entre na sua conta usando e-mail e senha.
       </p>
